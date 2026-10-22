@@ -1,3 +1,4 @@
+diff --git a/bsp/drivers/vin/modules/sensor/ov13850_mipi.c b/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
 --- a/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
 +++ b/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
 @@ -31,7 +31,7 @@
@@ -910,8 +911,25 @@
  	if (ctrl != NULL)
  		ctrl->flags |= V4L2_CTRL_FLAG_VOLATILE;
  
+diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
 --- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
 +++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
+@@ -581,7 +581,6 @@
+ 
+ &sdc0 {
+ 	bus-width = <4>;
+-	cd-gpios = <&pio PF 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+ 	/*non-removable;*/
+ 	/*broken-cd;*/
+ 	/*cd-inverted*/
+@@ -607,6 +606,7 @@
+ 	/*vqmmc18sw-supply = <&reg_aldo4>;*/
+ 	/*vdmmc18sw-supply = <&reg_aldo4>;*/
+ 	status = "okay";
++	broken-cd;
+ };
+ 
+ &sdc2 {
 @@ -854,12 +854,12 @@
  	};
  
@@ -981,6 +999,7 @@
  		status = "okay";
  	};
  
+diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
 --- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
 +++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
 @@ -33,12 +33,12 @@
@@ -998,6 +1017,19 @@
  CONFIG_SND_SOC_SUNXI_DEBUG=y
  CONFIG_SND_SOC_SUNXI_AAUDIO=y
  CONFIG_SND_SOC_SUNXI_I2S=y
+diff --git a/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh b/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
+--- a/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
++++ b/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
+@@ -10,6 +10,8 @@
+ 
+ # add
+ if [ "${ACTION}" == "add" ]; then
++    # Coldplug scans can repeat an add event for an already mounted device.
++    grep -q "^/dev/${MDEV} " /proc/mounts && exit 0
+     case ${MDEV} in
+         mmcblk[0-9])
+             [ -d "/sys/block/${MDEV}/${MDEV}p1" ] && exit 0
+diff --git a/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/Config.in b/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/Config.in
 --- a/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/Config.in
 +++ b/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/Config.in
 @@ -103,6 +103,13 @@
@@ -1014,6 +1046,7 @@
  config gc2083
  	bool "use sensor gc2083"
  	depends on libisp_select_sensor
+diff --git a/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/libisp_config.mk b/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/libisp_config.mk
 --- a/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/libisp_config.mk
 +++ b/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/libisp_config.mk
 @@ -25,6 +25,9 @@
@@ -1026,6 +1059,7 @@
  endif
  ifeq ($(CONFIG_gc2083),y)
      SENSOR_NAME+=gc2083
+diff --git a/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp
 --- a/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp
 +++ b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp
 @@ -18,6 +18,7 @@
@@ -1036,9 +1070,35 @@
      [ -f $MODULES_DIR/gc2083_mipi_vc.ko ] && insmod $MODULES_DIR/gc2083_mipi_vc.ko
      [ -f $MODULES_DIR/sc235hai_mipi.ko ] && insmod $MODULES_DIR/sc235hai_mipi.ko
      [ -f $MODULES_DIR/gc8613_mipi.ko ] && insmod $MODULES_DIR/gc8613_mipi.ko
+diff --git a/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
+new file mode 100755
+--- /dev/null
++++ b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
+@@ -0,0 +1,6 @@
++#!/bin/sh
++# Reuse /etc/mdev.conf and /usr/bin/hotplug.sh for SD card automount.
++[ "$1" = "start" ] || exit 0
++mkdir -p /mnt/SDCARD
++pidof mdev >/dev/null || /sbin/mdev -d
++/sbin/mdev -s
+diff --git a/openwrt/target/v861/v861-avaota_f2/defconfig b/openwrt/target/v861/v861-avaota_f2/defconfig
 --- a/openwrt/target/v861/v861-avaota_f2/defconfig
 +++ b/openwrt/target/v861/v861-avaota_f2/defconfig
-@@ -2662,7 +2662,8 @@
+@@ -1943,7 +1943,12 @@
+ # CONFIG_BUSYBOX_CONFIG_LOSETUP is not set
+ # CONFIG_BUSYBOX_CONFIG_LSPCI is not set
+ # CONFIG_BUSYBOX_CONFIG_LSUSB is not set
+-# CONFIG_BUSYBOX_CONFIG_MDEV is not set
++CONFIG_BUSYBOX_CONFIG_MDEV=y
++CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_CONF=y
++# CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_RENAME is not set
++CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_EXEC=y
++# CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_LOAD_FIRMWARE is not set
++CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_DAEMON=y
+ # CONFIG_BUSYBOX_CONFIG_MESG is not set
+ # CONFIG_BUSYBOX_CONFIG_MKE2FS is not set
+ # CONFIG_BUSYBOX_CONFIG_MKFS_EXT2 is not set
+@@ -2662,7 +2667,8 @@
  # CONFIG_gc1084 is not set
  # CONFIG_imx258 is not set
  # CONFIG_gc2053 is not set
@@ -1048,7 +1108,7 @@
  # CONFIG_gc4663 is not set
  # CONFIG_gc8613 is not set
  # CONFIG_f37p is not set
-@@ -3654,7 +3655,7 @@
+@@ -3654,7 +3660,7 @@
  # CONFIG_PACKAGE_kmod-sensor-cv8002 is not set
  # CONFIG_PACKAGE_kmod-sensor-gc13a2 is not set
  # CONFIG_PACKAGE_kmod-sensor-gc2053 is not set
@@ -1057,7 +1117,7 @@
  # CONFIG_PACKAGE_kmod-sensor-gc2083_vc is not set
  # CONFIG_PACKAGE_kmod-sensor-gc20c3 is not set
  # CONFIG_PACKAGE_kmod-sensor-gc4053 is not set
-@@ -3667,6 +3668,7 @@
+@@ -3667,6 +3673,7 @@
  # CONFIG_PACKAGE_kmod-sensor-imx681 is not set
  # CONFIG_PACKAGE_kmod-sensor-imx766 is not set
  # CONFIG_PACKAGE_kmod-sensor-os02g10 is not set
@@ -1065,6 +1125,7 @@
  # CONFIG_PACKAGE_kmod-sensor-sc231hai is not set
  # CONFIG_PACKAGE_kmod-sensor-sc2337p is not set
  # CONFIG_PACKAGE_kmod-sensor-sc235hai is not set
+diff --git a/openwrt/target/v861/v861-avaota_f2/modules.mk b/openwrt/target/v861/v861-avaota_f2/modules.mk
 --- a/openwrt/target/v861/v861-avaota_f2/modules.mk
 +++ b/openwrt/target/v861/v861-avaota_f2/modules.mk
 @@ -3,3 +3,13 @@
@@ -1081,6 +1142,8 @@
 +endef
 +
 +$(eval $(call KernelPackage,sensor-ov13850))
+diff --git a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h
+new file mode 100644
 --- /dev/null
 +++ b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h
 @@ -0,0 +1,14048 @@
@@ -15133,6 +15196,7 @@
 +
 +#endif /* end of _OV13850_MIPI_H_V861_ */
 \ No newline at end of file
+diff --git a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c
 --- a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c
 +++ b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c
 @@ -31,7 +31,7 @@
@@ -15177,6 +15241,7 @@
  #endif
  
  #ifdef SENSOR_GC2083
+diff --git a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/tina.mk b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/tina.mk
 --- a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/tina.mk
 +++ b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/tina.mk
 @@ -66,6 +66,10 @@

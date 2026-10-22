@@ -47,5 +47,7 @@
 
 ## 文件一致性验证
 
-完整补丁已在原 SDK 文件副本上执行 `git apply --check` 和 `git apply`，并与 `source/` 中的11个文件逐字节比较。
+完整补丁已在原 SDK 文件副本上执行 `git apply --check` 和 `git apply`，并与 `source/` 中的 13 个文件逐字节比较。
 SDK 完整构建、ISP 库和原版 sample_virvi 编译通过。原厂头文件与收到的文件 SHA-256 一致。
+
+SD 自动挂载及本次仓库一致性复核见 [SD 卡验证](sd-card.md)；上面的摄像头数据保留原测试批次，不代表本次重新测试。

@@ -1,19 +1,22 @@
-# Avaota F2 OV13850 适配补丁
+# Avaota F2 适配补丁
 
 基于 **Tina V861 v1.1 / Avaota F2 / Linux 6.6 Xuantie** 的 OV13850 摄像头最小适配，支持 **2560×1440 @ 30/60fps、MIPI CSI-2 四 Lane、RAW10 BGGR**，并接入原厂 ISP610 参数。
 
 已验证 2K30/60 收帧和出图。这里的 **2K 指 2560×1440**。当前采用单路 TDM 离线通路，**未开启图像拼接**。
 
+同时提供 TF 卡自动识别和自动挂载：MMC 轮询检测 + BusyBox mdev，挂载目录 `/mnt/SDCARD`。
+
 ## 仓库内容
 
 ```text
-source/                 修改后的完整文件，保留 SDK 相对路径，共 11 个
-patches/                相对未适配 SDK 的完整差异补丁
+source/                 修改后的完整文件，保留 SDK 相对路径，共 13 个
+patches/                完整补丁，以及仅供旧版升级的 SD 增量补丁
 test/                   2K30 / 2K60 出图与持续收帧配置
+docs/sd-card.md         SD 修改范围、测试结果及使用方法
 docs/changes.md         修改文件及用途
 docs/validation.md      测试结果和已知限制
 docs/clean-sdk-validation.md  干净 SDK 编译与上板复现记录
-source-manifest.json    11 个修改文件的 SHA-256
+source-manifest.json    13 个修改文件的 SHA-256
 SHA256SUMS              source/、patches/、test/ 文件校验值
 ```
 
@@ -23,7 +26,7 @@ SHA256SUMS              source/、patches/、test/ 文件校验值
 或在已配置 SSH 密钥的环境中改用：
 
 ```bash
-git clone git@github.com:dshanpi/avaota-f2-ov13850-patches.git "$HOME/Downloads/avaota-f2-ov13850-patches"
+git clone git@github.com:dshanpi/avaota-f2-patches.git "$HOME/Downloads/avaota-f2-patches"
 ```
 
 
@@ -33,11 +36,11 @@ git clone git@github.com:dshanpi/avaota-f2-ov13850-patches.git "$HOME/Downloads/
 
 ```bash
 # 根据实际位置修改这两个路径
-PATCH_DIR="$HOME/Downloads/avaota-f2-ov13850-patches"
+PATCH_DIR="$HOME/Downloads/avaota-f2-patches"
 SDK_DIR="$HOME/tina-v861-v1.1"
 
 # 已经克隆过仓库时跳过这一行
-git clone https://github.com/dshanpi/avaota-f2-ov13850-patches.git "$PATCH_DIR"
+git clone https://github.com/dshanpi/avaota-f2-patches.git "$PATCH_DIR"
 
 cd "$PATCH_DIR"
 sha256sum -c SHA256SUMS
@@ -54,11 +57,29 @@ cp -a "$PATCH_DIR/source/." "$SDK_DIR/"
 
 ```bash
 cd "$SDK_DIR"
-git apply --check "$PATCH_DIR/patches/ov13850-2k-with-vendor-isp.patch"
-git apply "$PATCH_DIR/patches/ov13850-2k-with-vendor-isp.patch"
+git apply --check "$PATCH_DIR/patches/avaota-f2-ov13850-2k-sd.patch"
+git apply "$PATCH_DIR/patches/avaota-f2-ov13850-2k-sd.patch"
 ```
 
-`git apply` 不要求 SDK 本身是 Git 仓库。若检查失败，先确认 SDK 版本和现有修改，不要强行套用。该补丁同时包含 Sensor、板级配置和原厂 ISP 接入。
+`git apply` 不要求 SDK 本身是 Git 仓库。若检查失败，先确认 SDK 版本和现有修改，不要强行套用。该补丁同时包含 Sensor、板级配置、原厂 ISP 接入和 SD 自动挂载。
+
+## 已适配摄像头的旧版 SDK 升级
+
+如果 SDK 已完整应用本仓库 `b61eff6` 的摄像头配置，只需应用四文件 SD 增量补丁：
+
+```bash
+cd "$SDK_DIR"
+git apply --check "$PATCH_DIR/patches/avaota-f2-sd-poll-automount.patch"
+git apply "$PATCH_DIR/patches/avaota-f2-sd-poll-automount.patch"
+```
+
+**完整文件替换、完整补丁、旧版 SD 增量补丁三种方法择一，不要重复应用。**
+不要在应用 SD 补丁后再用旧摄像头包覆盖 `board.dts` 或 OpenWrt `defconfig`。
+使用 `cp -a` 或 `git apply` 会保留启动脚本的执行权限；若经过 Windows 手动复制，请执行：
+
+```bash
+chmod +x openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
+```
 
 ## 编译
 
@@ -155,6 +176,29 @@ VI 计数反映硬件采集节奏，不等同于应用 PTS 帧率或编码帧率
 本次无存图测试约 20 秒统计窗口内测得约 30/60fps，两个计数均未增加。
 完整结果见 [干净 SDK 复现记录](docs/clean-sdk-validation.md)。
 
+## TF 卡自动识别和挂载
+
+烧录后，已插入的 TF 卡和后续插入的卡由内核检测，mdev 调用 SDK 原有脚本挂载。
+本次实测为 8GB SDHC / FAT32 单分区，路径为 `/mnt/SDCARD`：
+
+```sh
+cat /proc/partitions
+grep mmc /proc/mounts
+df -h /mnt/SDCARD
+pidof mdev
+```
+
+保存采集图片时，可将配置中的输出目录改为 `/mnt/SDCARD` 下的新目录。
+TF 卡拔出前先停止录像、采集和其他写入，再执行：
+
+```sh
+sync
+umount /mnt/SDCARD
+```
+
+自动识别不代表可以在写入中直接拔卡。轮询无卡时可能出现 MMC 探测超时日志；
+未为了隐藏这些日志修改 MMC 公共驱动。修改范围和实测边界见 [SD 卡说明](docs/sd-card.md)。
+
 ## 硬件与范围
 
 - 测试模组：DshanPI_CAM-OV13850-V1.0，经转接板连接 Avaota F2 四 Lane 接口。
@@ -171,8 +215,11 @@ VI 计数反映硬件采集节奏，不等同于应用 PTS 帧率或编码帧率
 
 ## 验证状态
 
-已从原始 SDK 压缩包全新解压，按本文命令完成全量编译、打包、烧录校验和原版示例出图。
-新增持续收帧配置也已上板测试；见 [干净 SDK 复现记录](docs/clean-sdk-validation.md)。
+摄像头基线曾从原始 SDK 压缩包全新解压，完成全量编译、打包、烧录校验和原版示例出图；
+新增持续收帧配置也已上板测试，见 [干净 SDK 复现记录](docs/clean-sdk-validation.md)。
+本次 SD 修复在该 SDK 上增量构建并烧录，启动挂载、实际热插拔和文件校验通过；
+仓库完整补丁和增量补丁均已应用检查，并与实际编译的 13 个源文件逐字节比较。
+未将 SD 验证描述为重新完成摄像头长测。
 
 
 2026-10-22 白色天花板场景短测：2K30 约 **29.97fps**，2K60 约 **59.89fps**，均能获取完整图像；新 ISP 相比此前临时使用的 GC2083 参数，明显改善绿偏和噪声。

@@ -1,11 +1,14 @@
-1bc4de02a5a4f32a0a2d68d44a20bc96115d6213f0b59eebfad653f39c206251  patches/ov13850-2k-with-vendor-isp.patch
+c9329770e587b4f11443fc37df3b81272ebe531e4ffb472436fc313da1e9af9e  patches/avaota-f2-ov13850-2k-sd.patch
+f341a605338eca04216e267e12be951389803872e445758c1d1852526d0c160f  patches/avaota-f2-sd-poll-automount.patch
 1ca26318c2d0c9e33681d3ae9c7915bc4e19921ba24fc5c435c45a8d9bfe67ea  source/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
-1045070f9e5f98e3e202828ab7ce5e4cfc1ddbed531aa7999334908808a83d25  source/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
+c14eafd6f7cccedb4e792251016a511220f4398a7e5147e1a6231cf526aa506c  source/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
 ef36950ddd966dee807e8ace7013eb5061e449b548f8cd07c38ce814e39e9a24  source/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
+513e1ffa17f2d2134ab1eced5d22d13ce9ecb77a3d3d725eed5b7d082a1d7a83  source/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
 308cfbb6ab2ed5b0b539b58808816ba570c30741638868d3928be9b11d231498  source/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/Config.in
 82a48b37d76df4c9b11b68c7fce6c7c640b63e959c792e056bad0fc26c2d556c  source/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/libisp_config.mk
 5a99b1e70667357ee4b5aae959fd046f883d734b84791732df9918b655b9bc5b  source/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp
-2c7f367d41bd35bff912dc41ad0580fd51ee632babf1221853fd453422a29b37  source/openwrt/target/v861/v861-avaota_f2/defconfig
+1fed2137f1fb26d9214e249fabdaba72659dc2ca03ec3fba3f2bccd3e7d4fd95  source/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
+7a1ff1605537fc023faf321393c0c02a9fc38c48d4c83b9545fd27e3dc169eb4  source/openwrt/target/v861/v861-avaota_f2/defconfig
 87c26b47bc66fc11e4023546cd7b4f9eb99f600f5ab10a80778382cfa6d2c39d  source/openwrt/target/v861/v861-avaota_f2/modules.mk
 752f97c6725d2f27b0fc5cdd871cc6219d224564012cd52f966b7e1d1d43adb5  source/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h
 19d3ef9f38951fa57a2db0c839824d0535c945ebde439a02d835bc53015fe685  source/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c

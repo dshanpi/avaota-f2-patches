@@ -1,0 +1,59 @@
+diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
+--- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
++++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
+@@ -581,7 +581,6 @@
+ 
+ &sdc0 {
+ 	bus-width = <4>;
+-	cd-gpios = <&pio PF 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+ 	/*non-removable;*/
+ 	/*broken-cd;*/
+ 	/*cd-inverted*/
+@@ -607,6 +606,7 @@
+ 	/*vqmmc18sw-supply = <&reg_aldo4>;*/
+ 	/*vdmmc18sw-supply = <&reg_aldo4>;*/
+ 	status = "okay";
++	broken-cd;
+ };
+ 
+ &sdc2 {
+diff --git a/openwrt/target/v861/v861-avaota_f2/defconfig b/openwrt/target/v861/v861-avaota_f2/defconfig
+--- a/openwrt/target/v861/v861-avaota_f2/defconfig
++++ b/openwrt/target/v861/v861-avaota_f2/defconfig
+@@ -1943,7 +1943,12 @@
+ # CONFIG_BUSYBOX_CONFIG_LOSETUP is not set
+ # CONFIG_BUSYBOX_CONFIG_LSPCI is not set
+ # CONFIG_BUSYBOX_CONFIG_LSUSB is not set
+-# CONFIG_BUSYBOX_CONFIG_MDEV is not set
++CONFIG_BUSYBOX_CONFIG_MDEV=y
++CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_CONF=y
++# CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_RENAME is not set
++CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_EXEC=y
++# CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_LOAD_FIRMWARE is not set
++CONFIG_BUSYBOX_CONFIG_FEATURE_MDEV_DAEMON=y
+ # CONFIG_BUSYBOX_CONFIG_MESG is not set
+ # CONFIG_BUSYBOX_CONFIG_MKE2FS is not set
+ # CONFIG_BUSYBOX_CONFIG_MKFS_EXT2 is not set
+diff --git a/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
+new file mode 100755
+--- /dev/null
++++ b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
+@@ -0,0 +1,6 @@
++#!/bin/sh
++# Reuse /etc/mdev.conf and /usr/bin/hotplug.sh for SD card automount.
++[ "$1" = "start" ] || exit 0
++mkdir -p /mnt/SDCARD
++pidof mdev >/dev/null || /sbin/mdev -d
++/sbin/mdev -s
+diff --git a/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh b/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
+--- a/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
++++ b/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
+@@ -10,6 +10,8 @@
+ 
+ # add
+ if [ "${ACTION}" == "add" ]; then
++    # Coldplug scans can repeat an add event for an already mounted device.
++    grep -q "^/dev/${MDEV} " /proc/mounts && exit 0
+     case ${MDEV} in
+         mmcblk[0-9])
+             [ -d "/sys/block/${MDEV}/${MDEV}p1" ] && exit 0
