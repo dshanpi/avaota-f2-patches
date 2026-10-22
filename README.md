@@ -15,7 +15,8 @@ test/                   2K30 / 2K60 出图与持续收帧配置
 docs/sd-card.md         SD 修改范围、测试结果及使用方法
 docs/changes.md         修改文件及用途
 docs/validation.md      测试结果和已知限制
-docs/clean-sdk-validation.md  干净 SDK 编译与上板复现记录
+docs/clean-sdk-with-sd-validation.md  摄像头 + TF 卡干净 SDK 全量复现
+docs/clean-sdk-validation.md  先前摄像头基线复现记录
 source-manifest.json    13 个修改文件的 SHA-256
 SHA256SUMS              source/、patches/、test/ 文件校验值
 ```
@@ -174,7 +175,7 @@ adb shell 'cat /proc/uptime; cat /sys/kernel/debug/mpp/vi; cat /proc/uptime' > v
 每次 uptime 用文件首末两行第一列的平均值。同时比较 `lost_cnt`、`error_cnt` 增量。
 VI 计数反映硬件采集节奏，不等同于应用 PTS 帧率或编码帧率。
 本次无存图测试约 20 秒统计窗口内测得约 30/60fps，两个计数均未增加。
-完整结果见 [干净 SDK 复现记录](docs/clean-sdk-validation.md)。
+最新完整结果见 [摄像头与 TF 卡干净 SDK 复现记录](docs/clean-sdk-with-sd-validation.md)。
 
 ## TF 卡自动识别和挂载
 
@@ -215,13 +216,13 @@ umount /mnt/SDCARD
 
 ## 验证状态
 
-摄像头基线曾从原始 SDK 压缩包全新解压，完成全量编译、打包、烧录校验和原版示例出图；
-新增持续收帧配置也已上板测试，见 [干净 SDK 复现记录](docs/clean-sdk-validation.md)。
-本次 SD 修复在该 SDK 上增量构建并烧录，启动挂载、实际热插拔和文件校验通过；
-仓库完整补丁和增量补丁均已应用检查，并与实际编译的 13 个源文件逐字节比较。
-未将 SD 验证描述为重新完成摄像头长测。
+2026-10-22 已使用新仓库 `c4073bb` 的 13 个源文件，在重新解压的原始 SDK 中按本 README
+完成配置、全量编译、打包、LYNX 烧录校验及上板验证，没有额外源码修补。
+2K30/60 均取得完整图像；无存图配置约 20 秒统计窗口的 VI 帧率分别为 **29.978 / 60.005fps**，
+丢帧和帧错误计数均未增加。TF 卡启动自动挂载、实际拔插后重新自动挂载、图片及原文件校验均通过。
+完整步骤、镜像摘要和实测边界见 [摄像头与 TF 卡干净 SDK 复现记录](docs/clean-sdk-with-sd-validation.md)。
 
 
-2026-10-22 白色天花板场景短测：2K30 约 **29.97fps**，2K60 约 **59.89fps**，均能获取完整图像；新 ISP 相比此前临时使用的 GC2083 参数，明显改善绿偏和噪声。
+此前调试工具的白色天花板场景短测：2K30 约 **29.97fps**，2K60 约 **59.89fps**，均能获取完整图像；新 ISP 相比此前临时使用的 GC2083 参数，明显改善绿偏和噪声。
 
-原厂参数标注为 1440p60；1440p30 共用同一套参数。此前调试采集工具短测有少量丢帧；原版示例存图路径的丢帧更多，持续收帧请用上面的 stream 配置。原厂参数与 SDK 的 AWB 字段兼容性告警仍存在。具体结果和边界见 [验证记录](docs/validation.md)。本仓库不宣称已完成零丢帧编码、长时间录制或完整 ISP 画质验收。
+原厂参数标注为 1440p60；1440p30 共用同一套参数。此前调试采集工具短测有少量丢帧；原版示例存图路径的丢帧更多，持续收帧请用上面的 stream 配置。原厂参数与 SDK 的 AWB 字段兼容性告警仍存在，本次开流也记录到偶发 I²C 写重试，未阻止收帧。具体结果和边界见 [验证记录](docs/validation.md)。本仓库不宣称已完成零丢帧编码、长时间录制或完整 ISP 画质验收。
