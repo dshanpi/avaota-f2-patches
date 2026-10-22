@@ -13,6 +13,10 @@
 
 本轮实测结果和限制见 [多模式验证记录](docs/multimode-validation.md)。采集帧率不代表编码帧率，原厂 ISP 参数复用不代表各分辨率均完成了独立画质标定。
 
+## 预编译固件和测试应用
+
+可以从 [v0.1.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.1.0) 下载匹配固件、采集应用和测试配置，使用 `run.sh <模式> save|stream` 存图或测持续收帧。完整步骤见 [Release 摄像头测试说明](docs/camera-test-v0.1.0.md)。
+
 ## 仓库内容与修改范围
 
 ```text
