@@ -1,0 +1,25 @@
+{
+  "label": "post4k-1440p60-stream",
+  "samples": [
+    {
+      "uptime": 762.23,
+      "counts": [
+        573,
+        0,
+        0
+      ]
+    },
+    {
+      "uptime": 782.26,
+      "counts": [
+        1774,
+        0,
+        0
+      ]
+    }
+  ],
+  "seconds": 20.029999999999973,
+  "vi_fps": 59.96005991013488,
+  "lost_delta": 0,
+  "error_delta": 0
+}

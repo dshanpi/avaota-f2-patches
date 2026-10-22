@@ -1,0 +1,345 @@
+{
+  "720p30-save": {
+    "width": 1280,
+    "height": 720,
+    "target_fps": 30,
+    "samples": [
+      {
+        "uptime": 105.1,
+        "frames": 271,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 125.125,
+        "frames": 872,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.025000000000006,
+    "vi_fps": 30.012484394506856,
+    "lost_delta": 0,
+    "error_delta": 0,
+    "image_bytes": 1382400,
+    "image_sha256": "7b12a3ebacf3b2246a8b775a90c0d9cc1a951582ce1d9fab471f20bac84e8af6",
+    "image_md5": "b08e0b82f1ef78ff31058f54a1728962"
+  },
+  "720p30-stream": {
+    "width": 1280,
+    "height": 720,
+    "target_fps": 30,
+    "samples": [
+      {
+        "uptime": 143.065,
+        "frames": 290,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 163.085,
+        "frames": 891,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.02000000000001,
+    "vi_fps": 30.019980019980004,
+    "lost_delta": 0,
+    "error_delta": 0
+  },
+  "720p60-save": {
+    "width": 1280,
+    "height": 720,
+    "target_fps": 60,
+    "samples": [
+      {
+        "uptime": 179.185,
+        "frames": 578,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 199.215,
+        "frames": 1780,
+        "lost": 1,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.03,
+    "vi_fps": 60.009985022466296,
+    "lost_delta": 1,
+    "error_delta": 0,
+    "image_bytes": 1382400,
+    "image_sha256": "14588460f7203806bbb5fe98d699fff4061e3eab0b86a516f0b075589be7577a",
+    "image_md5": "ae79e6629f82469b718a684d81d897be"
+  },
+  "720p60-stream": {
+    "width": 1280,
+    "height": 720,
+    "target_fps": 60,
+    "samples": [
+      {
+        "uptime": 216.28,
+        "frames": 581,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 236.305,
+        "frames": 1782,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.025000000000006,
+    "vi_fps": 59.97503121098625,
+    "lost_delta": 0,
+    "error_delta": 0
+  },
+  "1080p30-save": {
+    "width": 1920,
+    "height": 1080,
+    "target_fps": 30,
+    "samples": [
+      {
+        "uptime": 252.385,
+        "frames": 292,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 272.41,
+        "frames": 893,
+        "lost": 4,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.025000000000034,
+    "vi_fps": 30.012484394506814,
+    "lost_delta": 4,
+    "error_delta": 0,
+    "image_bytes": 3110400,
+    "image_sha256": "a74d15c9bfa490a9f1f7eb21f9ea300802f09aba731eadf90896b812978d4ccc",
+    "image_md5": "bf467d051bf31d685240e086684bd45f"
+  },
+  "1080p30-stream": {
+    "width": 1920,
+    "height": 1080,
+    "target_fps": 30,
+    "samples": [
+      {
+        "uptime": 290.53499999999997,
+        "frames": 292,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 310.56,
+        "frames": 893,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.025000000000034,
+    "vi_fps": 30.012484394506814,
+    "lost_delta": 0,
+    "error_delta": 0
+  },
+  "1080p60-save": {
+    "width": 1920,
+    "height": 1080,
+    "target_fps": 60,
+    "samples": [
+      {
+        "uptime": 326.355,
+        "frames": 580,
+        "lost": 195,
+        "errors": 0
+      },
+      {
+        "uptime": 346.385,
+        "frames": 1782,
+        "lost": 656,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.029999999999973,
+    "vi_fps": 60.00998502246638,
+    "lost_delta": 461,
+    "error_delta": 0,
+    "image_bytes": 3110400,
+    "image_sha256": "351234651a221aeb810c635bce2057e2e5160b3d283d20498f696b5b2771933f",
+    "image_md5": "48164fefb17af7eeeb05a2a9dba9bf77"
+  },
+  "1080p60-stream": {
+    "width": 1920,
+    "height": 1080,
+    "target_fps": 60,
+    "samples": [
+      {
+        "uptime": 364.62,
+        "frames": 580,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 384.645,
+        "frames": 1781,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.024999999999977,
+    "vi_fps": 59.97503121098634,
+    "lost_delta": 0,
+    "error_delta": 0
+  },
+  "1440p30-save": {
+    "width": 2560,
+    "height": 1440,
+    "target_fps": 30,
+    "samples": [
+      {
+        "uptime": 400.615,
+        "frames": 290,
+        "lost": 94,
+        "errors": 0
+      },
+      {
+        "uptime": 420.645,
+        "frames": 891,
+        "lost": 394,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.029999999999973,
+    "vi_fps": 30.00499251123319,
+    "lost_delta": 300,
+    "error_delta": 0,
+    "image_bytes": 5529600,
+    "image_sha256": "1799844c0d034327f5d1d7f44ab979d4ab6513322b864bb13cbb83dbc1857a11",
+    "image_md5": "e60151f81077cca087d23ded1c98b87a"
+  },
+  "1440p30-stream": {
+    "width": 2560,
+    "height": 1440,
+    "target_fps": 30,
+    "samples": [
+      {
+        "uptime": 440.3,
+        "frames": 287,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 460.325,
+        "frames": 888,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.024999999999977,
+    "vi_fps": 30.0124843945069,
+    "lost_delta": 0,
+    "error_delta": 0
+  },
+  "1440p60-save": {
+    "width": 2560,
+    "height": 1440,
+    "target_fps": 60,
+    "samples": [
+      {
+        "uptime": 476.515,
+        "frames": 590,
+        "lost": 289,
+        "errors": 0
+      },
+      {
+        "uptime": 496.6,
+        "frames": 1792,
+        "lost": 1014,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.085000000000036,
+    "vi_fps": 59.845655962160706,
+    "lost_delta": 725,
+    "error_delta": 0,
+    "image_bytes": 5529600,
+    "image_sha256": "a0f665500b1afa9195275a6b092c3fcfb90b61d9a8edd82d5a4b4744ff0c0813",
+    "image_md5": "6707bb138823b78d368ea3e84524998a"
+  },
+  "1440p60-stream": {
+    "width": 2560,
+    "height": 1440,
+    "target_fps": 60,
+    "samples": [
+      {
+        "uptime": 515.805,
+        "frames": 567,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 535.835,
+        "frames": 1768,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.030000000000086,
+    "vi_fps": 59.96005991013454,
+    "lost_delta": 0,
+    "error_delta": 0
+  },
+  "4k25-save": {
+    "width": 3840,
+    "height": 2160,
+    "target_fps": 25,
+    "samples": [
+      {
+        "uptime": 552.005,
+        "frames": 241,
+        "lost": 100,
+        "errors": 0
+      },
+      {
+        "uptime": 572.045,
+        "frames": 742,
+        "lost": 476,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.039999999999964,
+    "vi_fps": 25.000000000000046,
+    "lost_delta": 376,
+    "error_delta": 0,
+    "image_bytes": 12441600,
+    "image_sha256": "a400e65ce06bb2c4b355f96fc596cc1a0fab1eeb049732ad8f4cc847f7e76baa",
+    "image_md5": "5f297d13989e402766fe70e2d94b1932"
+  },
+  "4k25-stream": {
+    "width": 3840,
+    "height": 2160,
+    "target_fps": 25,
+    "samples": [
+      {
+        "uptime": 595.785,
+        "frames": 241,
+        "lost": 0,
+        "errors": 0
+      },
+      {
+        "uptime": 615.815,
+        "frames": 742,
+        "lost": 0,
+        "errors": 0
+      }
+    ],
+    "seconds": 20.030000000000086,
+    "vi_fps": 25.012481278082767,
+    "lost_delta": 0,
+    "error_delta": 0
+  }
+}

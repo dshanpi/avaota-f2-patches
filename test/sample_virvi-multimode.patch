@@ -1,0 +1,27 @@
+--- a/platform/allwinner/eyesee-mpp/middleware/sun252iw1/sample/sample_virvi/sample_virvi.c
++++ b/platform/allwinner/eyesee-mpp/middleware/sun252iw1/sample/sample_virvi/sample_virvi.c
+@@ -903,7 +903,8 @@
+     pViAttr->format.colorspace = pConfig->mColorSpace;
+     pViAttr->format.width = pConfig->PicWidth;
+     pViAttr->format.height = pConfig->PicHeight;
+-    pViAttr->nbufs = 3;
++    /* Two 4K YUV buffers fit the Avaota F2 50 MiB video pool. */
++    pViAttr->nbufs = pConfig->PicWidth == 3840 ? 2 : 3;
+     pViAttr->nplanes = 2;
+     pViAttr->fps = pConfig->FrameRate;
+     pViAttr->use_current_win = 0;
+@@ -952,6 +953,14 @@
+     pCap->mIspDev = pConfig->mIspDevNum;
+     if (pCap->mIspDev >= 0)
+     {
++        /* Native 720p: avoid the previously reproduced D3D LBC compression fault. */
++        if (pConfig->PicWidth == 1280 && pConfig->PicHeight == 720) {
++            eRet = AW_MPI_ISP_SetD3dLbcRatio(pCap->mIspDev, 100);
++            if (eRet != SUCCESS) {
++                aloge("720p D3D LBC 1x setup failed: 0x%x", eRet);
++                return -1;
++            }
++        }
+         if (stVIAttr.large_dma_merge_en > DMA_STITCH_NONE) {
+             if (stVIAttr.large_dma_merge_en == DMA_STITCH_2IN1_LINEAR)
+             {

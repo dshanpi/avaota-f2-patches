@@ -1,169 +1,140 @@
 # Avaota F2 适配补丁
 
-基于 **Tina V861 v1.1 / Avaota F2 / Linux 6.6 Xuantie** 的 OV13850 摄像头最小适配，支持 **2560×1440 @ 30/60fps、MIPI CSI-2 四 Lane、RAW10 BGGR**，并接入原厂 ISP610 参数。
+基于 **Tina V861 v1.1 / Avaota F2 NOR / Linux 6.6 Xuantie**，提供 OV13850 四 Lane RAW10 BGGR 驱动、原厂 ISP610 参数接入，以及 TF 卡自动识别和挂载。
 
-已验证 2K30/60 收帧和出图。这里的 **2K 指 2560×1440**。当前采用单路 TDM 离线通路，**未开启图像拼接**。
+| 模式 | Sensor 输出 | 帧率 | 采集通路 |
+|---|---|---|---|
+| 720p | 1280×720 | 30 / 60fps | video0 / ISP0，不拼接 |
+| 1080p | 1920×1080 | 30 / 60fps | video0 / ISP0，不拼接 |
+| 2K / 1440p | 2560×1440 | 30 / 60fps | video0 / ISP0，不拼接 |
+| 4K | 3840×2160 | 25fps | video1 / ISP1，单帧左右分块处理再合并 |
 
-同时提供 TF 卡自动识别和自动挂载：MMC 轮询检测 + BusyBox mdev，挂载目录 `/mnt/SDCARD`。
+这是 Sensor 原生模式选择，不是把 2K 图像缩放成其他尺寸。720p/1080p 使用 Sensor 裁剪，视场与 2K/4K 不同。默认仍为 2K30，**没有 `lanes`、`video_modes`、`mode4k` 等模块参数**；应用在开流前指定尺寸与帧率。
 
-## 仓库内容
+本轮实测结果和限制见 [多模式验证记录](docs/multimode-validation.md)。采集帧率不代表编码帧率，原厂 ISP 参数复用不代表各分辨率均完成了独立画质标定。
+
+## 仓库内容与修改范围
 
 ```text
-source/                 修改后的完整文件，保留 SDK 相对路径，共 13 个
-patches/                完整补丁，以及仅供旧版升级的 SD 增量补丁
-test/                   2K30 / 2K60 出图与持续收帧配置
-docs/sd-card.md         SD 修改范围、测试结果及使用方法
-docs/changes.md         修改文件及用途
-docs/validation.md      测试结果和已知限制
-docs/clean-sdk-with-sd-validation.md  摄像头 + TF 卡干净 SDK 全量复现
-docs/clean-sdk-validation.md  先前摄像头基线复现记录
-source-manifest.json    13 个修改文件的 SHA-256
-SHA256SUMS              source/、patches/、test/ 文件校验值
+source/                 13 个完整源文件，保留 SDK 相对路径
+patches/                原始 SDK 完整补丁和指定版本增量补丁
+test/modes/             7 档模式，各一份存图和一份持续收帧配置
+test/sample_virvi-multimode.patch  4K/720p 采集示例的独立补丁
+test/                   保留原有 2K 测试配置
+docs/changes.md         每个修改文件的用途
+docs/multimode-validation.md      本轮多模式测试记录
+docs/clean-sdk-with-sd-validation.md  先前 2K + TF 卡干净 SDK 复现
+source-manifest.json    13 个源文件的 SHA-256
+SHA256SUMS              source/、patches/、test/ 校验值
 ```
 
-本仓库提供 SDK 源文件和补丁，不包含完整 SDK、预编译固件或采集程序。
+相对已验证的 2K+TF 卡基线 `ca43209`，只改四个 SDK 文件：Sensor 模式表、ISP 配置匹配表、板级设备树、BSP defconfig。原厂 ISP 头文件和原有 2K 寄存器表保持不变，保留原板级 50MiB 视频内存池；没有修改 VIN/TDM/VIPP/ISP 内核公共实现、CCI 或内存分配器。
 
-克隆仓库需要相应的 GitHub 访问权限。若 HTTPS 提示需要用户名/认证，请先配置访问凭据，
-或在已配置 SSH 密钥的环境中改用：
+4K/720p 另需采集程序的两处配置，见下文。仓库不包含完整 SDK、预编译固件或采集程序。
 
-```bash
-git clone git@github.com:dshanpi/avaota-f2-patches.git "$HOME/Downloads/avaota-f2-patches"
-```
+## 安装到 SDK
 
-
-## 使用方法一：直接替换文件（推荐）
-
-适用于与本仓库基线一致的 Tina V861 v1.1 SDK、Avaota F2 NOR 方案。其他版本或已有定制的 SDK 请先对比差异；覆盖前保存自己的修改，尤其是设备树和 defconfig。
+适用于相同版本 SDK 和 Avaota F2 NOR 板级方案。覆盖前保存自己的修改，尤其是设备树和 defconfig。
 
 ```bash
-# 根据实际位置修改这两个路径
 PATCH_DIR="$HOME/Downloads/avaota-f2-patches"
 SDK_DIR="$HOME/tina-v861-v1.1"
-
-# 已经克隆过仓库时跳过这一行
+# 已克隆时跳过；也可使用 git@github.com:dshanpi/avaota-f2-patches.git
 git clone https://github.com/dshanpi/avaota-f2-patches.git "$PATCH_DIR"
-
 cd "$PATCH_DIR"
 sha256sum -c SHA256SUMS
-
-# 将 source 里面的 bsp、device、openwrt、platform 合并到 SDK 同名目录
 cp -a "$PATCH_DIR/source/." "$SDK_DIR/"
 ```
 
-**复制 `source/` 里面的内容到 SDK 根目录，不是把整个 `source` 文件夹放进 SDK。** 这些文件用于替换 SDK 中的源码；复制完成后必须重新编译。
+复制的是 `source/` 的内容到 SDK 根目录。必须重新编译，不是将这些源码复制到开发板。
 
-## 使用方法二：应用完整补丁
-
-与方法一二选一，**不要重复应用**。在尚未适配 OV13850 的同版本 SDK 根目录执行：
+也可以在未适配的原始 SDK 上应用完整补丁，**与文件替换二选一**：
 
 ```bash
 cd "$SDK_DIR"
-git apply --check "$PATCH_DIR/patches/avaota-f2-ov13850-2k-sd.patch"
-git apply "$PATCH_DIR/patches/avaota-f2-ov13850-2k-sd.patch"
+git apply --check "$PATCH_DIR/patches/avaota-f2-ov13850-sd.patch"
+git apply "$PATCH_DIR/patches/avaota-f2-ov13850-sd.patch"
 ```
 
-`git apply` 不要求 SDK 本身是 Git 仓库。若检查失败，先确认 SDK 版本和现有修改，不要强行套用。该补丁同时包含 Sensor、板级配置、原厂 ISP 接入和 SD 自动挂载。
-
-## 已适配摄像头的旧版 SDK 升级
-
-如果 SDK 已完整应用本仓库 `b61eff6` 的摄像头配置，只需应用四文件 SD 增量补丁：
+若 SDK 已完整应用 `ca43209` 的 2K+TF 卡配置，则可用以下四文件增量补丁代替完整补丁：
 
 ```bash
 cd "$SDK_DIR"
-git apply --check "$PATCH_DIR/patches/avaota-f2-sd-poll-automount.patch"
-git apply "$PATCH_DIR/patches/avaota-f2-sd-poll-automount.patch"
+git apply --check "$PATCH_DIR/patches/avaota-f2-ov13850-multimode-from-ca43209.patch"
+git apply "$PATCH_DIR/patches/avaota-f2-ov13850-multimode-from-ca43209.patch"
 ```
 
-**完整文件替换、完整补丁、旧版 SD 增量补丁三种方法择一，不要重复应用。**
-不要在应用 SD 补丁后再用旧摄像头包覆盖 `board.dts` 或 OpenWrt `defconfig`。
-使用 `cp -a` 或 `git apply` 会保留启动脚本的执行权限；若经过 Windows 手动复制，请执行：
+`git apply` 不要求 SDK 本身是 Git 仓库。检查失败时先核对版本和已有修改，不要强行套用或重复应用。旧 `avaota-f2-sd-poll-automount.patch` 仅供 `b61eff6` 增加 SD 支持，不能用它升级到多模式版本。
+
+## 编译固件与采集程序
+
+宿主机需先按 SDK 文档安装编译依赖。本轮使用 Ubuntu 24.04.4 LTS。首次运行 `./build.sh` 时，需在终端阅读 SDK 声明并按提示确认。
+
+需要测试 4K/720p 时，**在编译前**应用独立的示例程序补丁：
 
 ```bash
-chmod +x openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
+cd "$SDK_DIR"
+git apply --check "$PATCH_DIR/test/sample_virvi-multimode.patch"
+git apply "$PATCH_DIR/test/sample_virvi-multimode.patch"
 ```
 
-## 编译
-
-本次复现使用已安装 SDK 编译依赖的 Ubuntu 24.04.4 LTS 主机，SDK 从原始压缩包重新解压。
-请先按 SDK 文档准备宿主编译环境。首次运行 `./build.sh` 会显示 SDK 声明并等待交互确认；
-请在终端中阅读并按提示选择，不要在这一阶段关闭标准输入。
-
-首次配置使用：
+它使 4K 请求两个 YUV 缓冲区，并在 720p 的 `AW_MPI_ISP_Run` 前调用 `AW_MPI_ISP_SetD3dLbcRatio(isp, 100)`，避免此前复现的 D3D 压缩故障。其他尺寸保留示例的三个缓冲区请求，但本 SDK 开启 `CONFIG_FRAMEDONE_TWO_BUFFER` 后，驱动实际统一分配两个，需以运行日志为准。自有应用也需要对应配置；这些是 SDK 现有 API，不是模块参数。仅测试 2K/1080p 可使用原版示例。
 
 ```bash
 cd "$SDK_DIR"
 ./build.sh autoconfig -i v861 -o openwrt -b avaota_f2 -n nor -k linux-6.6-xuantie -a riscv32
 ./build.sh loadconfig
-
 cp openwrt/target/v861/v861-avaota_f2/defconfig openwrt/openwrt/.config
 ./build.sh openwrt_rootfs defconfig
 ./build.sh
 ./build.sh pack
 ```
 
-如果 SDK 已正确配置，可以从复制 OpenWrt `defconfig` 开始。构建使用 SDK 的 `./build.sh`，无需在非交互 shell 中依赖 `source build/envsetup.sh` 定义的函数。
+烧录 `out/v861_linux_avaota_f2_uart0_nor.img`。首次应用设备树/内核配置需要完整新固件。若经 Windows 手工复制文件，还需确认 `S05mdev` 保留执行权限。
 
-固件打包输出可在 SDK 的 `out/` 下查找；本适配使用 Avaota F2 NOR 目标，标准镜像名为 `v861_linux_avaota_f2_uart0_nor.img`。首次安装驱动和设备树时，需用匹配的烧录工具烧录新镜像。
-
-### 原厂 ISP 参数如何生效
-
-本 SDK 使用静态 ISP 库。原厂参数编译到 `libisp_ini.a`，随后链接进采集或编码程序。
-
-- 修改过 ISP 后，需要重新编译 ISP 库，并重新链接使用它的业务程序。
-- 只替换 `ov13850_mipi.ko`，或把原厂 `.h` 复制到板端，不会启用新 ISP。
-- 固件默认不将 MPP 采集示例安装到 rootfs，需要另外传入编译后的程序。
-
-只重新编译 ISP 和 MPP 示例时：
+ISP 参数静态链接进业务程序：只替换 `ov13850_mipi.ko` 或把 `.h` 传到板端不会更新 ISP。固件默认不安装 MPP 示例，需要单独传输。只重新编译 ISP 和示例可执行：
 
 ```bash
-cd "$SDK_DIR"
 ./build.sh openwrt_rootfs package/subpackage/allwinner/vision/libAWIspApi/compile V=s
 ./build.sh openwrt_rootfs package/subpackage/allwinner/eyesee-mpp/middleware/compile V=s
 ```
 
-如果自有业务工程使用预编译静态库，请更新其链接输入并重新链接，不能继续运行旧二进制。
-
 ## 上板采集
 
-新固件启动时由 `S00mpp` 自动加载 `ov13850_mipi`。驱动**不需要额外的 `insmod` 参数**；30/60fps 由采集程序在开流前选择，默认模式为 30fps。
-
-使用 SDK 编译生成的 `sample_virvi` 和本仓库配置进行验证：
+启动脚本自动加载驱动。以下以 1080p60 为例，测试其他模式只改 `MODE`：`720p30`、`720p60`、`1080p30`、`1080p60`、`1440p30`、`1440p60`、`4k25`。
 
 ```bash
-# 主机上执行；存在多块板时给 adb 指定正确的设备
-adb push "$SDK_DIR/platform/allwinner/eyesee-mpp/middleware/sun252iw1/sample/sample_virvi/sample_virvi" /tmp/sample_virvi
-adb push "$PATCH_DIR/test/isp-30.conf" /tmp/isp-test.conf
-adb shell 'mkdir -p /tmp/minimal2k; chmod +x /tmp/sample_virvi'
-adb shell 'LD_LIBRARY_PATH=/usr/lib/eyesee-mpp:/usr/lib /tmp/sample_virvi -path /tmp/isp-test.conf'
-adb pull /tmp/minimal2k/frame.nv21 ./ov13850-2k30.nv21
+MODE=1080p60
+# 多块板时，先用 adb -s 或 -t 选择目标板；下面假定只有一个目标设备
+adb shell 'grep " /mnt/SDCARD " /proc/mounts'
+adb shell 'mkdir -p /mnt/SDCARD/ov13850-multimode-current'
+adb push "$SDK_DIR/platform/allwinner/eyesee-mpp/middleware/sun252iw1/sample/sample_virvi/sample_virvi" /mnt/SDCARD/sample_virvi
+adb push "$PATCH_DIR/test/modes/$MODE-save.conf" /tmp/capture.conf
+adb shell 'chmod +x /mnt/SDCARD/sample_virvi'
+adb shell 'LD_LIBRARY_PATH=/usr/lib/eyesee-mpp:/usr/lib /mnt/SDCARD/sample_virvi -path /tmp/capture.conf'
+adb pull /mnt/SDCARD/ov13850-multimode-current/frame.nv21 "./$MODE.nv21"
 ```
 
-测试 60fps 时改用 `test/isp-60.conf`。每轮运行前先保存上一轮图片；`/tmp` 是内存文件系统，重启后内容消失。输出为 NV21，2560×1440 单帧应为 **5,529,600 字节**。示例保存的是启动阶段的一帧，严格画质评估应等待 AE/AWB 收敛后再取图。
+先确认 TF 卡已挂载；每轮先取回上一张图片，配置会覆盖同一路径。输出是 NV21，大小为 `宽×高×3/2`，可用对应尺寸的 YUV 播放器查看。测试程序运行 35 秒，开头丢弃 90 帧，再保存一帧；这不构成严格 AE/AWB 收敛或画质验收。
 
-在运行日志中确认出现：
+日志应匹配所选模式，例如：
 
 ```text
-find ov13850_mipi_2560_1440_30_0 [ov13850_mipi_isp610_20261021_195907] isp config
+find ov13850_mipi_1920_1080_60_0 [ov13850_mipi_isp610_20261021_195907] isp config
 ```
 
-60fps 应匹配 `_60_0`。采集过程中 `/sys/kernel/debug/mpp/isp` 也应显示相同 ISP 配置名。
+4K 配置使用 `dev_num_0=1`、`isp_dev_num_0=1`、`stitch_mode_0=1`；其他模式为 `0/0/0`。一次只运行一个模式，停止后再切换。
 
-### 持续收帧与帧率检查
+### 持续收帧和实际帧率
 
-`isp-30.conf` / `isp-60.conf` 用于保存图片。SDK 原版 `sample_virvi` 在保存完指定的一张图后，
-仍然执行整帧 `memcpy` 和存图缓冲清零，因此会增加 CPU/内存开销，实测有明显 `lost_cnt` 增长。
-不能用这两份存图配置证明业务程序能够持续交付 30/60fps。
-
-检查持续收帧时使用 `stream-30.conf` / `stream-60.conf`：它们只关闭存图路径
-（`save_pic_dev=-1`、`yuv_frm_count=0`、`save_pic_buffer_num=0`），驱动、ISP 和采集程序不变。
-这两份配置不输出图片。
+`*-save.conf` 用来获取图片。原版示例在存满一张后仍执行整帧复制和清零，会引入 CPU/内存开销及丢帧。测持续收帧应使用关闭存图的 `*-stream.conf`：
 
 ```bash
-adb push "$PATCH_DIR/test/stream-60.conf" /tmp/isp-test.conf
-adb shell 'LD_LIBRARY_PATH=/usr/lib/eyesee-mpp:/usr/lib /tmp/sample_virvi -path /tmp/isp-test.conf'
+adb push "$PATCH_DIR/test/modes/$MODE-stream.conf" /tmp/capture.conf
+adb shell 'LD_LIBRARY_PATH=/usr/lib/eyesee-mpp:/usr/lib /mnt/SDCARD/sample_virvi -path /tmp/capture.conf'
 ```
 
-程序运行共 35 秒。在另一个主机终端中，等待开流约 10 秒后采样：
+在另一个终端于开流约 10 秒后，间隔 20 秒采集两次：
 
 ```bash
 adb shell 'cat /proc/uptime; cat /sys/kernel/debug/mpp/vi; cat /proc/uptime' > vi-a.txt
@@ -171,58 +142,27 @@ sleep 20
 adb shell 'cat /proc/uptime; cat /sys/kernel/debug/mpp/vi; cat /proc/uptime' > vi-b.txt
 ```
 
-取两次 `vi0` 的 `frame => cnt` 差值，除以两次 uptime 的差值，可估算 VI 帧率；
-每次 uptime 用文件首末两行第一列的平均值。同时比较 `lost_cnt`、`error_cnt` 增量。
-VI 计数反映硬件采集节奏，不等同于应用 PTS 帧率或编码帧率。
-本次无存图测试约 20 秒统计窗口内测得约 30/60fps，两个计数均未增加。
-最新完整结果见 [摄像头与 TF 卡干净 SDK 复现记录](docs/clean-sdk-with-sd-validation.md)。
+选取活动 `vi0`（4K 为 `vi1`）的 `frame => cnt` 差值，除以 uptime 差值；每个文件 uptime 取首末行第一列均值。同时比较 `lost_cnt`、`error_cnt` 增量，并检查输入、输出尺寸。VI 硬件计数不等于应用交付或编码帧率。
 
-## TF 卡自动识别和挂载
+## TDM 与 4K 分块
 
-烧录后，已插入的 TF 卡和后续插入的卡由内核检测，mdev 调用 SDK 原有脚本挂载。
-本次实测为 8GB SDHC / FAT32 单分区，路径为 `/mnt/SDCARD`：
+本 SDK 的四 Lane 接收通路启用 `CONFIG_SUPPORT_ISP_TDM` 后使用 MIPI `TWO_DATA` 输出；此前关闭后出现行宽/MIPI 错误。沿用已验证的 TDM 离线配置。
 
-```sh
-cat /proc/partitions
-grep mmc /proc/mounts
-df -h /mnt/SDCARD
-pidof mdev
-```
+720p、1080p、2K 使用 `OV13850 → MIPI0 → CSI0 → TDM_RX0 → ISP0 → VIPP0`，不启用拼接。4K 使用 SDK 自带的左右分块处理和合并，处理的是同一颗 Sensor 的同一帧，不是双摄拼接。为 4K 启用第二逻辑 ISP/VIPP 路由、`CONFIG_TDM_LBC_EN` 和 `CONFIG_FRAMEDONE_TWO_BUFFER`；没有改公共驱动实现，也没有扩大内存池。
 
-保存采集图片时，可将配置中的输出目录改为 `/mnt/SDCARD` 下的新目录。
-TF 卡拔出前先停止录像、采集和其他写入，再执行：
+## TF 卡
 
-```sh
-sync
-umount /mnt/SDCARD
-```
+MMC 使用轮询检测，BusyBox mdev 复用 SDK 挂载脚本。FAT32 单分区卡挂载到 `/mnt/SDCARD`；可用 `grep mmc /proc/mounts`、`df -h /mnt/SDCARD` 检查。
 
-自动识别不代表可以在写入中直接拔卡。轮询无卡时可能出现 MMC 探测超时日志；
-未为了隐藏这些日志修改 MMC 公共驱动。修改范围和实测边界见 [SD 卡说明](docs/sd-card.md)。
+拔卡前先停止采集和写入，再执行 `sync; umount /mnt/SDCARD`。自动识别不代表写入时可直接拔卡。轮询无卡时可能出现 MMC 超时日志。详情见 [SD 卡说明](docs/sd-card.md)。
 
-## 硬件与范围
+## 硬件和已知边界
 
-- 测试模组：DshanPI_CAM-OV13850-V1.0，经转接板连接 Avaota F2 四 Lane 接口。
-- 使用 MIPI0 / CSI0、TWI1、MCLK1；RESET 为 PA14，模组外部 3.3V 供电。
-- SDK 中 I²C 地址为 `0x20`（8 位表示），Linux 7 位地址为 `0x10`。
-- 设备树包含具体板级供电、引脚和路由，不适用于未经核对的其他转接板。
-- 仅提供 1440p30/60；本仓库不包含 4K、1080p、720p 模式。
+- DshanPI_CAM-OV13850-V1.0，经转接板接 Avaota F2 四 Lane 接口；MIPI0/CSI0、TWI1、MCLK1、RESET PA14、模组外部 3.3V。
+- SDK I²C 地址 `0x20` 为 8 位表示，Linux 7 位地址为 `0x10`。其他模组/转接板须核对引脚。
+- 原厂 ISP 参数标注为 1440p60，所有模式复用同一套参数；头文件按字节原样保留。
+- 原厂参数与 SDK 的 AWB 字段兼容性告警、偶发 I²C 重试需按日志如实记录；短时出图不代表这些告警均已解决。
+- 4K 两次测试均在停流边界出现一次 `tdm0 rx0 frame error`，持续收帧统计窗口内没有帧错误。此停流告警仍保留，不能将本版描述为所有阶段零报错。
+- 本仓库不宣称完成各模式的长期零丢帧编码、全部场景画质验收或对不同硬件版本的兼容性认证。
 
-## 为什么仍然启用 TDM
-
-本版 SDK 在 V861 四 Lane 模式下，只有启用 `CONFIG_SUPPORT_ISP_TDM` 才使用 MIPI `TWO_DATA` 输出。当前 Sensor 时序关闭该选项时，实测出现 MIPI / 行宽错误，未正常收帧；启用标准 TDM 离线配置后恢复。
-
-通路为 `OV13850 → MIPI0 → CSI0 → TDM_RX0 → ISP0 → VIPP0`。Sensor 输入和最终输出均为 2560×1440，采集配置 `stitch_mode_0=0`、`dma_merge_scaler_en_0=0`。**TDM 离线通路不等于图像拼接，也不意味着所有 2K 配置都必须使用 TDM。**
-
-## 验证状态
-
-2026-10-22 已使用新仓库 `c4073bb` 的 13 个源文件，在重新解压的原始 SDK 中按本 README
-完成配置、全量编译、打包、LYNX 烧录校验及上板验证，没有额外源码修补。
-2K30/60 均取得完整图像；无存图配置约 20 秒统计窗口的 VI 帧率分别为 **29.978 / 60.005fps**，
-丢帧和帧错误计数均未增加。TF 卡启动自动挂载、实际拔插后重新自动挂载、图片及原文件校验均通过。
-完整步骤、镜像摘要和实测边界见 [摄像头与 TF 卡干净 SDK 复现记录](docs/clean-sdk-with-sd-validation.md)。
-
-
-此前调试工具的白色天花板场景短测：2K30 约 **29.97fps**，2K60 约 **59.89fps**，均能获取完整图像；新 ISP 相比此前临时使用的 GC2083 参数，明显改善绿偏和噪声。
-
-原厂参数标注为 1440p60；1440p30 共用同一套参数。此前调试采集工具短测有少量丢帧；原版示例存图路径的丢帧更多，持续收帧请用上面的 stream 配置。原厂参数与 SDK 的 AWB 字段兼容性告警仍存在，本次开流也记录到偶发 I²C 写重试，未阻止收帧。具体结果和边界见 [验证记录](docs/validation.md)。本仓库不宣称已完成零丢帧编码、长时间录制或完整 ISP 画质验收。
+先前 2K-only 版本的干净 SDK 全量复现记录见 [历史验证](docs/clean-sdk-with-sd-validation.md)，不能替代本轮新增模式验证。

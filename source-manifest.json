@@ -1,15 +1,15 @@
 [
   {
     "path": "bsp/drivers/vin/modules/sensor/ov13850_mipi.c",
-    "sha256": "1ca26318c2d0c9e33681d3ae9c7915bc4e19921ba24fc5c435c45a8d9bfe67ea"
+    "sha256": "4abaf52cf80c78fd36873f4d3c83be09d9dc264e9c691a4052aebbe6a8677632"
   },
   {
     "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts",
-    "sha256": "c14eafd6f7cccedb4e792251016a511220f4398a7e5147e1a6231cf526aa506c"
+    "sha256": "fd4c41d8d9ed738c5f677a6dfc7befac82bebc462f13a9a3642106aaea7befdc"
   },
   {
     "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig",
-    "sha256": "ef36950ddd966dee807e8ace7013eb5061e449b548f8cd07c38ce814e39e9a24"
+    "sha256": "a400848a07fd3957bdcda02f6184623305ba8dd62857e7a6215238e139d449b9"
   },
   {
     "path": "openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh",
@@ -45,7 +45,7 @@
   },
   {
     "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c",
-    "sha256": "19d3ef9f38951fa57a2db0c839824d0535c945ebde439a02d835bc53015fe685"
+    "sha256": "cea76c4352779351232c55c132182efd6e3bb2cf2f722cf8d374bab96cf94b09"
   },
   {
     "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/tina.mk",

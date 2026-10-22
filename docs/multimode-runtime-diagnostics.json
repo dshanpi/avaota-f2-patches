@@ -1,0 +1,162 @@
+{
+  "720p30-save": {
+    "new_kernel_lines": 18,
+    "i2c_write_retries": 1,
+    "kernel_messages": [
+      "[   95.914392] dma dma0chan0: sunxi:dma The timeout func is not suportted or chan->private is NULL, timeout mode not used",
+      "[   96.075445] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[   96.084081] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x20",
+      "[   96.093401] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[   96.101728] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3601/0xfc"
+    ]
+  },
+  "720p30-stream": {
+    "new_kernel_lines": 21,
+    "i2c_write_retries": 2,
+    "kernel_messages": [
+      "[  133.357365] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  133.365999] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  133.375318] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  133.383648] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3521/0x80",
+      "[  133.396798] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  133.405427] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  133.414744] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  133.423063] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3660/0x82"
+    ]
+  },
+  "720p60-save": {
+    "new_kernel_lines": 25,
+    "i2c_write_retries": 3,
+    "kernel_messages": [
+      "[  169.481337] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  169.489972] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  169.499290] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  169.507622] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3521/0x80",
+      "[  169.520764] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  169.529395] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  169.538713] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  169.547042] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3660/0x82",
+      "[  169.560446] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  169.569077] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  169.578393] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  169.586721] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3730/0x0"
+    ]
+  },
+  "720p60-stream": {
+    "new_kernel_lines": 21,
+    "i2c_write_retries": 2,
+    "kernel_messages": [
+      "[  206.574352] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  206.582986] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  206.592295] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  206.600614] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3520/0x0",
+      "[  206.646922] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  206.655553] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  206.664863] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  206.673172] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x380d/0xc0"
+    ]
+  },
+  "1080p30-save": {
+    "new_kernel_lines": 14,
+    "i2c_write_retries": 0,
+    "kernel_messages": []
+  },
+  "1080p30-stream": {
+    "new_kernel_lines": 14,
+    "i2c_write_retries": 0,
+    "kernel_messages": []
+  },
+  "1080p60-save": {
+    "new_kernel_lines": 22,
+    "i2c_write_retries": 2,
+    "kernel_messages": [
+      "[  316.695454] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  316.704090] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  316.713403] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  316.721730] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x380e/0x6",
+      "[  316.734366] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  316.742996] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  316.752347] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  316.760669] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x4022/0x7"
+    ]
+  },
+  "1080p60-stream": {
+    "new_kernel_lines": 22,
+    "i2c_write_retries": 2,
+    "kernel_messages": [
+      "[  354.960690] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  354.969327] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  354.978646] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  354.986980] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x380e/0x6",
+      "[  354.999911] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  355.008543] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x38",
+      "[  355.017860] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  355.027522] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x4023/0x5f"
+    ]
+  },
+  "1440p30-save": {
+    "new_kernel_lines": 21,
+    "i2c_write_retries": 2,
+    "kernel_messages": [
+      "[  390.922170] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  390.930805] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  390.940125] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  390.948451] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3520/0x0",
+      "[  390.994866] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  391.003498] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  391.012807] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  391.021127] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x380d/0xc0"
+    ]
+  },
+  "1440p30-stream": {
+    "new_kernel_lines": 29,
+    "i2c_write_retries": 4,
+    "kernel_messages": [
+      "[  430.600364] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  430.608998] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  430.618315] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  430.626645] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3521/0x80",
+      "[  430.639905] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  430.648534] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  430.657847] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  430.666165] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3668/0x54",
+      "[  430.679412] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  430.688039] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  430.697354] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  430.705676] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3730/0x0",
+      "[  430.719090] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  430.727718] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  430.737032] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  430.745345] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x3d8c/0x73"
+    ]
+  },
+  "1440p60-save": {
+    "new_kernel_lines": 13,
+    "i2c_write_retries": 0,
+    "kernel_messages": []
+  },
+  "1440p60-stream": {
+    "new_kernel_lines": 17,
+    "i2c_write_retries": 1,
+    "kernel_messages": [
+      "[  506.387024] sunxi:twi -2502400.twi:[ERR]: drv-mode: Timeout when sending 9th SCL clk",
+      "[  506.395659] sunxi:twi -2502400.twi:[ERR]: drv mode: TWI BUS error state is drv:0x1 eng:0x30",
+      "[  506.404971] sunxi:twi -2502400.twi:[ERR]: drv-mode: xfer failed (dev addr:0x10)",
+      "[  506.413293] sunxi:vin :[INFO]: [VIN_DEV_I2C]ov13850_mipi write retry 2, write addr/data is 0x380d/0xc0"
+    ]
+  },
+  "4k25-save": {
+    "new_kernel_lines": 18,
+    "i2c_write_retries": 0,
+    "kernel_messages": [
+      "[  577.509011] sunxi:vin :[ERR]: tdm0 rx0 frame error! width is 152, height is 615"
+    ]
+  },
+  "4k25-stream": {
+    "new_kernel_lines": 18,
+    "i2c_write_retries": 0,
+    "kernel_messages": [
+      "[  621.277017] sunxi:vin :[ERR]: tdm0 rx0 frame error! width is 0, height is 643"
+    ]
+  }
+}

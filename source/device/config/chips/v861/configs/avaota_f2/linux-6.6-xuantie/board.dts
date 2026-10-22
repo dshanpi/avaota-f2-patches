@@ -864,7 +864,7 @@
 	};
 
 	isp01:isp@58ffffc {
-		status = "disabled";
+		status = "okay";
 		delay_init = <0>;
 	};
 
@@ -897,7 +897,7 @@
 	};
 
 	scaler01:scaler@590fffc {
-		status = "disabled";
+		status = "okay";
 		delay_init = <0>;
 	};
 
@@ -1138,17 +1138,17 @@
 	};
 
 	vinc01:vinc@582fffc {
-		vinc1_csi_sel = <1>;
-		vinc1_mipi_sel = <1>;
+		vinc1_csi_sel = <0>;
+		vinc1_mipi_sel = <0>;
 		vinc1_isp_sel = <1>;
 		vinc1_isp_tx_ch = <0>;
 		vinc1_tdm_rx_sel = <1>;
 		vinc1_vipp_sel = <1>;
-		vinc1_rear_sensor_sel = <1>;
-		vinc1_front_sensor_sel = <1>;
+		vinc1_rear_sensor_sel = <0>;
+		vinc1_front_sensor_sel = <0>;
 		vinc1_sensor_list = <0>;
 		delay_init = <0>;
-		status = "disabled";
+		status = "okay";
 	};
 
 	vinc02:vinc@582fff8 {

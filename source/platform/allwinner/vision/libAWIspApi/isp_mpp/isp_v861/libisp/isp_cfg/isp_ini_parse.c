@@ -1936,6 +1936,12 @@ struct isp_cfg_array cfg_arr[] = {
 	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 2560, 1440, 60, 0, 0, &ov13850_mipi_isp_cfg},
 	/* 30 fps uses the same vendor 60 fps tuning; no separate 30 fps calibration was supplied. */
 	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 2560, 1440, 30, 0, 0, &ov13850_mipi_isp_cfg},
+	/* Other geometries reuse the supplied 1440p tuning; separate IQ calibration is pending. */
+	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 3840, 2160, 25, 0, 0, &ov13850_mipi_isp_cfg},
+	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1920, 1080, 30, 0, 0, &ov13850_mipi_isp_cfg},
+	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1920, 1080, 60, 0, 0, &ov13850_mipi_isp_cfg},
+	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1280, 720, 30, 0, 0, &ov13850_mipi_isp_cfg},
+	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1280, 720, 60, 0, 0, &ov13850_mipi_isp_cfg},
 #endif
 
 #ifdef SENSOR_GC2083

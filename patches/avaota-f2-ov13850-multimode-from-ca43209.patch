@@ -1,0 +1,408 @@
+diff --git a/bsp/drivers/vin/modules/sensor/ov13850_mipi.c b/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
+--- a/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
++++ b/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
+@@ -48,7 +48,7 @@
+ /*
+  * OV13850 R2A, 24 MHz MCLK, four-lane RAW10.
+  * Common initialization derived from the module vendor K230 reference;
+- * only the 2560x1440 30/60 fps modes are exposed.
++ * native 4K25 and 1440p/1080p/720p 30/60 fps modes are exposed.
+  */
+ 
+ static struct regval_list sensor_default_regs[] = {
+@@ -371,6 +371,267 @@
+ 	{REG_DLY, 5},
+ };
+ 
++/* Native 3840x2160 at 25 fps; V861 ISP requires its split-frame path. */
++static struct regval_list sensor_3840x2160_25fps_regs[] = {
++	{0x3612, 0x26},
++	{0x370a, 0x24},
++	{0x372a, 0x00},
++	{0x372f, 0xa0},
++	{0x3800, 0x00},
++	{0x3801, 0xc8},
++	{0x3802, 0x01},
++	{0x3803, 0xe8},
++	{0x3804, 0x0f},
++	{0x3805, 0xd7},
++	{0x3806, 0x0a},
++	{0x3807, 0x67},
++	{0x3808, 0x0f},
++	{0x3809, 0x00},
++	{0x380a, 0x08},
++	{0x380b, 0x70},
++	{0x380c, 0x12},
++	{0x380d, 0xc0},
++	{0x380e, 0x0b},
++	{0x380f, 0x29},
++	{0x3810, 0x00},
++	{0x3811, 0x04},
++	{0x3812, 0x00},
++	{0x3813, 0x04},
++	{0x3814, 0x11},
++	{0x3815, 0x11},
++	{0x3820, 0x00},
++	{0x3821, 0x04},
++	{0x3836, 0x04},
++	{0x3837, 0x01},
++	{0x4601, 0x60},
++	{0x4603, 0x01},
++	{0x4020, 0x00},
++	{0x4021, 0xe6},
++	{0x4022, 0x0e},
++	{0x4023, 0x26},
++	{0x4024, 0x0f},
++	{0x4025, 0x08},
++	{0x4026, 0x0f},
++	{0x4027, 0x0e},
++	{0x4603, 0x01},
++	{0x5401, 0x71},
++	{0x5405, 0x80},
++	/* VCO 1200 MHz, timing clock 342857142 Hz; HTS 4800, VTS 2857. */
++	{0x3614, 0x32},
++};
++
++/* Preserve the full binned analogue/black-level window; crop digitally. */
++
++static struct regval_list sensor_1920x1080_30fps_regs[] = {
++	{0x3611, 0x10},
++	/* Lower VCO before reducing its divider: SCLK never exceeds 126 MHz. */
++	{0x3614, 0x28},
++	{REG_DLY, 5},
++	{0x3612, 0x23},
++	{REG_DLY, 5},
++	{0x3613, 0x33},
++	{0x370a, 0x26},
++	{0x372a, 0x00},
++	{0x372f, 0x90},
++	{0x3800, 0x00},
++	{0x3801, 0x08},
++	{0x3802, 0x00},
++	{0x3803, 0x04},
++	{0x3804, 0x10},
++	{0x3805, 0x97},
++	{0x3806, 0x0c},
++	{0x3807, 0x4b},
++	{0x3808, 0x07},
++	{0x3809, 0x80},
++	{0x380a, 0x04},
++	{0x380b, 0x38},
++	{0x380c, 0x12},
++	{0x380d, 0xc0},
++	{0x380e, 0x0d},
++	{0x380f, 0x05},
++	{0x3810, 0x00},
++	{0x3811, 0x64},
++	{0x3812, 0x00},
++	{0x3813, 0xf6},
++	{0x3814, 0x31},
++	{0x3815, 0x31},
++	{0x3820, 0x02},
++	{0x3821, 0x05},
++	{0x3836, 0x08},
++	{0x3837, 0x02},
++	{0x4601, 0x60},
++	{0x4603, 0x01},
++	{0x5401, 0x61},
++	{0x5405, 0x40},
++	{0x4020, 0x00},
++	{0x4021, 0xe4},
++	{0x4022, 0x07},
++	{0x4023, 0x5f},
++	{0x4024, 0x08},
++	{0x4025, 0x44},
++	{0x4026, 0x08},
++	{0x4027, 0x47},
++	{REG_DLY, 5},
++};
++
++static struct regval_list sensor_1920x1080_60fps_regs[] = {
++	{0x3611, 0x10},
++	/* Lower VCO before reducing its divider: SCLK never exceeds 126 MHz. */
++	{0x3614, 0x28},
++	{REG_DLY, 5},
++	{0x3612, 0x23},
++	{REG_DLY, 5},
++	{0x3613, 0x33},
++	{0x370a, 0x26},
++	{0x372a, 0x00},
++	{0x372f, 0x90},
++	{0x3800, 0x00},
++	{0x3801, 0x08},
++	{0x3802, 0x00},
++	{0x3803, 0x04},
++	{0x3804, 0x10},
++	{0x3805, 0x97},
++	{0x3806, 0x0c},
++	{0x3807, 0x4b},
++	{0x3808, 0x07},
++	{0x3809, 0x80},
++	{0x380a, 0x04},
++	{0x380b, 0x38},
++	{0x380c, 0x12},
++	{0x380d, 0xc0},
++	{0x380e, 0x06},
++	{0x380f, 0x83},
++	{0x3810, 0x00},
++	{0x3811, 0x64},
++	{0x3812, 0x00},
++	{0x3813, 0xf6},
++	{0x3814, 0x31},
++	{0x3815, 0x31},
++	{0x3820, 0x02},
++	{0x3821, 0x05},
++	{0x3836, 0x08},
++	{0x3837, 0x02},
++	{0x4601, 0x60},
++	{0x4603, 0x01},
++	{0x5401, 0x61},
++	{0x5405, 0x40},
++	{0x4020, 0x00},
++	{0x4021, 0xe4},
++	{0x4022, 0x07},
++	{0x4023, 0x5f},
++	{0x4024, 0x08},
++	{0x4025, 0x44},
++	{0x4026, 0x08},
++	{0x4027, 0x47},
++	{REG_DLY, 5},
++};
++
++static struct regval_list sensor_1280x720_30fps_regs[] = {
++	{0x3611, 0x10},
++	/* Lower VCO before reducing its divider: SCLK never exceeds 126 MHz. */
++	{0x3614, 0x28},
++	{REG_DLY, 5},
++	{0x3612, 0x23},
++	{REG_DLY, 5},
++	{0x3613, 0x33},
++	{0x370a, 0x26},
++	{0x372a, 0x00},
++	{0x372f, 0x90},
++	{0x3800, 0x00},
++	{0x3801, 0x08},
++	{0x3802, 0x00},
++	{0x3803, 0x04},
++	{0x3804, 0x10},
++	{0x3805, 0x97},
++	{0x3806, 0x0c},
++	{0x3807, 0x4b},
++	{0x3808, 0x05},
++	{0x3809, 0x00},
++	{0x380a, 0x02},
++	{0x380b, 0xd0},
++	{0x380c, 0x12},
++	{0x380d, 0xc0},
++	{0x380e, 0x0d},
++	{0x380f, 0x05},
++	{0x3810, 0x01},
++	{0x3811, 0xa4},
++	{0x3812, 0x01},
++	{0x3813, 0xaa},
++	{0x3814, 0x31},
++	{0x3815, 0x31},
++	{0x3820, 0x02},
++	{0x3821, 0x05},
++	{0x3836, 0x08},
++	{0x3837, 0x02},
++	{0x4601, 0x60},
++	/* Automatic FIFO start is required for this narrow digital crop. */
++	{0x4603, 0x00},
++	{0x5401, 0x61},
++	{0x5405, 0x40},
++	{0x4020, 0x00},
++	{0x4021, 0xe4},
++	{0x4022, 0x07},
++	{0x4023, 0x5f},
++	{0x4024, 0x08},
++	{0x4025, 0x44},
++	{0x4026, 0x08},
++	{0x4027, 0x47},
++	{REG_DLY, 5},
++};
++
++static struct regval_list sensor_1280x720_60fps_regs[] = {
++	{0x3611, 0x10},
++	/* Lower VCO before reducing its divider: SCLK never exceeds 126 MHz. */
++	{0x3614, 0x28},
++	{REG_DLY, 5},
++	{0x3612, 0x23},
++	{REG_DLY, 5},
++	{0x3613, 0x33},
++	{0x370a, 0x26},
++	{0x372a, 0x00},
++	{0x372f, 0x90},
++	{0x3800, 0x00},
++	{0x3801, 0x08},
++	{0x3802, 0x00},
++	{0x3803, 0x04},
++	{0x3804, 0x10},
++	{0x3805, 0x97},
++	{0x3806, 0x0c},
++	{0x3807, 0x4b},
++	{0x3808, 0x05},
++	{0x3809, 0x00},
++	{0x380a, 0x02},
++	{0x380b, 0xd0},
++	{0x380c, 0x12},
++	{0x380d, 0xc0},
++	{0x380e, 0x06},
++	{0x380f, 0x83},
++	{0x3810, 0x01},
++	{0x3811, 0xa4},
++	{0x3812, 0x01},
++	{0x3813, 0xaa},
++	{0x3814, 0x31},
++	{0x3815, 0x31},
++	{0x3820, 0x02},
++	{0x3821, 0x05},
++	{0x3836, 0x08},
++	{0x3837, 0x02},
++	{0x4601, 0x60},
++	/* Automatic FIFO start is required for this narrow digital crop. */
++	{0x4603, 0x00},
++	{0x5401, 0x61},
++	{0x5405, 0x40},
++	{0x4020, 0x00},
++	{0x4021, 0xe4},
++	{0x4022, 0x07},
++	{0x4023, 0x5f},
++	{0x4024, 0x08},
++	{0x4025, 0x44},
++	{0x4026, 0x08},
++	{0x4027, 0x47},
++	{REG_DLY, 5},
++};
++
+ static struct regval_list sensor_fmt_raw[] = {
+ 
+ };
+@@ -474,7 +735,7 @@
+ 
+ 	exp_val = exp_gain->exp_val;
+ 	gain_val = exp_gain->gain_val;
+-	/* Fixed VTS: AE must not lower the selected 30/60 fps. */
++	/* Fixed VTS: AE must not lower the selected frame rate. */
+ 	exp_val = clamp(exp_val, 16, (ov13850_sensor_vts - 16) << 4);
+ 	gain_val = clamp(gain_val, 16, 64 * 16 - 1);
+ 
+@@ -778,6 +1039,46 @@
+ 		.gain_min = 16, .gain_max = 15 << 4,
+ 		.regs = sensor_2560x1440_60fps_regs, .regs_size = ARRAY_SIZE(sensor_2560x1440_60fps_regs),
+ 	},
++	{
++		.width = 3840, .height = 2160,
++		.hts = 4800, .vts = 2857, .pclk = 342857142,
++		.mipi_bps = 1200000000, .fps_fixed = 25, .bin_factor = 1,
++		.intg_min = 16, .intg_max = (2857 - 16) << 4,
++		.gain_min = 16, .gain_max = 15 << 4,
++		.regs = sensor_3840x2160_25fps_regs, .regs_size = ARRAY_SIZE(sensor_3840x2160_25fps_regs),
++	},
++	{
++		.width = 1920, .height = 1080,
++		.hts = 4800, .vts = 3333, .pclk = 480000000,
++		.mipi_bps = 1200000000, .fps_fixed = 30, .bin_factor = 2,
++		.intg_min = 16, .intg_max = (3333 - 16) << 4,
++		.gain_min = 16, .gain_max = 15 << 4,
++		.regs = sensor_1920x1080_30fps_regs, .regs_size = ARRAY_SIZE(sensor_1920x1080_30fps_regs),
++	},
++	{
++		.width = 1920, .height = 1080,
++		.hts = 4800, .vts = 1667, .pclk = 480000000,
++		.mipi_bps = 1200000000, .fps_fixed = 60, .bin_factor = 2,
++		.intg_min = 16, .intg_max = (1667 - 16) << 4,
++		.gain_min = 16, .gain_max = 15 << 4,
++		.regs = sensor_1920x1080_60fps_regs, .regs_size = ARRAY_SIZE(sensor_1920x1080_60fps_regs),
++	},
++	{
++		.width = 1280, .height = 720,
++		.hts = 4800, .vts = 3333, .pclk = 480000000,
++		.mipi_bps = 1200000000, .fps_fixed = 30, .bin_factor = 2,
++		.intg_min = 16, .intg_max = (3333 - 16) << 4,
++		.gain_min = 16, .gain_max = 15 << 4,
++		.regs = sensor_1280x720_30fps_regs, .regs_size = ARRAY_SIZE(sensor_1280x720_30fps_regs),
++	},
++	{
++		.width = 1280, .height = 720,
++		.hts = 4800, .vts = 1667, .pclk = 480000000,
++		.mipi_bps = 1200000000, .fps_fixed = 60, .bin_factor = 2,
++		.intg_min = 16, .intg_max = (1667 - 16) << 4,
++		.gain_min = 16, .gain_max = 15 << 4,
++		.regs = sensor_1280x720_60fps_regs, .regs_size = ARRAY_SIZE(sensor_1280x720_60fps_regs),
++	},
+ };
+ 
+ #define N_WIN_SIZES (ARRAY_SIZE(sensor_win_sizes))
+diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
+--- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
++++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
+@@ -864,7 +864,7 @@
+ 	};
+ 
+ 	isp01:isp@58ffffc {
+-		status = "disabled";
++		status = "okay";
+ 		delay_init = <0>;
+ 	};
+ 
+@@ -897,7 +897,7 @@
+ 	};
+ 
+ 	scaler01:scaler@590fffc {
+-		status = "disabled";
++		status = "okay";
+ 		delay_init = <0>;
+ 	};
+ 
+@@ -1138,17 +1138,17 @@
+ 	};
+ 
+ 	vinc01:vinc@582fffc {
+-		vinc1_csi_sel = <1>;
+-		vinc1_mipi_sel = <1>;
++		vinc1_csi_sel = <0>;
++		vinc1_mipi_sel = <0>;
+ 		vinc1_isp_sel = <1>;
+ 		vinc1_isp_tx_ch = <0>;
+ 		vinc1_tdm_rx_sel = <1>;
+ 		vinc1_vipp_sel = <1>;
+-		vinc1_rear_sensor_sel = <1>;
+-		vinc1_front_sensor_sel = <1>;
++		vinc1_rear_sensor_sel = <0>;
++		vinc1_front_sensor_sel = <0>;
+ 		vinc1_sensor_list = <0>;
+ 		delay_init = <0>;
+-		status = "disabled";
++		status = "okay";
+ 	};
+ 
+ 	vinc02:vinc@582fff8 {
+diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
+--- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
++++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
+@@ -34,6 +34,8 @@
+ CONFIG_VIN_USE_ION_SIZE_POOL_HEAP=y
+ CONFIG_VIN_DMA_OPS=y
+ CONFIG_SUPPORT_ISP_TDM=y
++CONFIG_TDM_LBC_EN=y
++CONFIG_FRAMEDONE_TWO_BUFFER=y
+ CONFIG_D3D=y
+ CONFIG_D3D_LBC_MODE=y
+ CONFIG_D3D_COMPRESS_EN=y
+diff --git a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c
+--- a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c
++++ b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c
+@@ -1936,6 +1936,12 @@
+ 	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 2560, 1440, 60, 0, 0, &ov13850_mipi_isp_cfg},
+ 	/* 30 fps uses the same vendor 60 fps tuning; no separate 30 fps calibration was supplied. */
+ 	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 2560, 1440, 30, 0, 0, &ov13850_mipi_isp_cfg},
++	/* Other geometries reuse the supplied 1440p tuning; separate IQ calibration is pending. */
++	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 3840, 2160, 25, 0, 0, &ov13850_mipi_isp_cfg},
++	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1920, 1080, 30, 0, 0, &ov13850_mipi_isp_cfg},
++	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1920, 1080, 60, 0, 0, &ov13850_mipi_isp_cfg},
++	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1280, 720, 30, 0, 0, &ov13850_mipi_isp_cfg},
++	{"ov13850_mipi", "ov13850_mipi_isp610_20261021_195907", 1280, 720, 60, 0, 0, &ov13850_mipi_isp_cfg},
+ #endif
+ 
+ #ifdef SENSOR_GC2083
