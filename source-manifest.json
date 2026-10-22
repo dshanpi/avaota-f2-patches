@@ -1,15 +1,39 @@
 [
   {
+    "path": "bsp/drivers/net/wireless/rtl8189fs/Makefile",
+    "sha256": "5fca33fd9686d6b7042a9ce2225cc9667ec55b0343de2b7143d8fce5c3a16d96"
+  },
+  {
+    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c",
+    "sha256": "088e11665b80d39698acd0becdeba54d5ec37352838b00cf1dddca933cc5c9cd"
+  },
+  {
+    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c",
+    "sha256": "6a95a1c6d6e94b5824c879fa9e941ad4a8d4434c0a783e41a491fcf0b10002e3"
+  },
+  {
+    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/rtw_proc.c",
+    "sha256": "5d7383f41cb3f92391fc367eed19b5aad8165077074450f93e9ae2e4a1d0a2d9"
+  },
+  {
+    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/wifi_regd.c",
+    "sha256": "9b5b04ce1060876a16a89eaaad3abcc9067aeff731fbec63fc86a9a28a6358a0"
+  },
+  {
+    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/osdep_service.c",
+    "sha256": "32066d56f15a1283c1e803d0a6d4423b0855f5efbf2b033ebf385c014af36fa9"
+  },
+  {
     "path": "bsp/drivers/vin/modules/sensor/ov13850_mipi.c",
     "sha256": "4abaf52cf80c78fd36873f4d3c83be09d9dc264e9c691a4052aebbe6a8677632"
   },
   {
     "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts",
-    "sha256": "fd4c41d8d9ed738c5f677a6dfc7befac82bebc462f13a9a3642106aaea7befdc"
+    "sha256": "e6c8a9a15a54faec5a42607bac80bd493ee3612a94de2cb41ad5d6bc4bf1b559"
   },
   {
     "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig",
-    "sha256": "a400848a07fd3957bdcda02f6184623305ba8dd62857e7a6215238e139d449b9"
+    "sha256": "6a7081d352ef0d3031e8d54bed15a982c6b20aa2883a95f6c137794188bd8aab"
   },
   {
     "path": "openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh",
@@ -32,12 +56,16 @@
     "sha256": "1fed2137f1fb26d9214e249fabdaba72659dc2ca03ec3fba3f2bccd3e7d4fd95"
   },
   {
+    "path": "openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S06tfwifi",
+    "sha256": "7f7bf86865d0af4d53fdcce57dff0734986b726fb915dc69bd37cc16aef58b51"
+  },
+  {
     "path": "openwrt/target/v861/v861-avaota_f2/defconfig",
-    "sha256": "7a1ff1605537fc023faf321393c0c02a9fc38c48d4c83b9545fd27e3dc169eb4"
+    "sha256": "e658f3d2d91c7ac562a99ffed5d006c67721deb5c8e30ac01492501739b8199b"
   },
   {
     "path": "openwrt/target/v861/v861-avaota_f2/modules.mk",
-    "sha256": "87c26b47bc66fc11e4023546cd7b4f9eb99f600f5ab10a80778382cfa6d2c39d"
+    "sha256": "68c31d01b16542011e0fd3fc14f15b31af0cebb38f94aff9ee1671db1d8718ac"
   },
   {
     "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h",

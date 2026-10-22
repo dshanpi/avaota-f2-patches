@@ -420,7 +420,7 @@
 	auto_print@54321 {
 		reg = <0x0 0x54321 0x0 0x0>;
 		device_type = "auto_print";
-		status = "okay";
+		status = "disabled";
 	};
 };
 
@@ -590,15 +590,10 @@
 	cd-used-24M;
 	cd-set-debounce = <0x1>;
 	cap-sd-highspeed;
-	sd-uhs-sdr50;
-	sd-uhs-ddr50;
-	sd-uhs-sdr104;
-	no-sdio;
 	no-mmc;
 	/* b2c-ecc-on; */
-	sunxi-power-save-mode;
 	/*sunxi-dis-signal-vol-sw;*/
-	max-frequency = <150000000>;
+	max-frequency = <25000000>;
 	ctl-spec-caps = <0x428>;
 	/*vmmc-supply = <&reg_cldo3>;*/
 	/*vqmmc33sw-supply = <&reg_cldo3>;*/
@@ -607,6 +602,8 @@
 	/*vdmmc18sw-supply = <&reg_aldo4>;*/
 	status = "okay";
 	broken-cd;
+	cap-sdio-irq;
+	no-1-8-v;
 };
 
 &sdc2 {

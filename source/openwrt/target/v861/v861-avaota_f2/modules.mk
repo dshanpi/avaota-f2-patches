@@ -13,3 +13,15 @@ define KernelPackage/sensor-ov13850
 endef
 
 $(eval $(call KernelPackage,sensor-ov13850))
+
+# Use BSP-native cfg80211 and RTL8189FS from this kernel, not backports.
+define KernelPackage/tf-rtl8189fs
+	SUBMENU:=$(WIRELESS_MENU)
+	TITLE:=Avaota F2 removable TF RTL8189FS SDIO WiFi
+	KCONFIG:=CONFIG_CFG80211=m CONFIG_CFG80211_WEXT=y CONFIG_RTL8189FS=m
+	FILES:= \
+		$(CONFIG_EXTERNAL_KERNEL_TREE)/net/wireless/cfg80211.ko \
+		$(CONFIG_EXTERNAL_KERNEL_TREE)/bsp/drivers/net/wireless/rtl8189fs/8189fs.ko
+endef
+
+$(eval $(call KernelPackage,tf-rtl8189fs))

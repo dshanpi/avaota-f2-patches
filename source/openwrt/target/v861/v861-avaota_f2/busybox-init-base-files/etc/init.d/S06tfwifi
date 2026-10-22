@@ -1,0 +1,6 @@
+#!/bin/sh
+# Register the SDIO driver; the kernel binds it only to matching WiFi cards.
+[ "$1" = "start" ] || exit 0
+MODULES_DIR="/lib/modules/$(uname -r)"
+[ -d /sys/module/cfg80211 ] || insmod "$MODULES_DIR/cfg80211.ko" || exit 1
+[ -d /sys/module/8189fs ] || insmod "$MODULES_DIR/8189fs.ko"

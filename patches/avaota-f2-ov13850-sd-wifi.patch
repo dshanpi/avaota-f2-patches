@@ -1,3 +1,305 @@
+diff --git a/bsp/drivers/net/wireless/rtl8189fs/Makefile b/bsp/drivers/net/wireless/rtl8189fs/Makefile
+--- a/bsp/drivers/net/wireless/rtl8189fs/Makefile
++++ b/bsp/drivers/net/wireless/rtl8189fs/Makefile
+@@ -1,3 +1,5 @@
++# Removable TF SDIO card supplies its own enable; inherit RISC-V Kbuild.
++EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+ EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+@@ -70,8 +72,8 @@
+ CONFIG_GSPI_HCI = n
+ ########################## Features ###########################
+ CONFIG_AP_MODE = y
+-CONFIG_P2P = y
+-CONFIG_MP_INCLUDED = y
++CONFIG_P2P = n
++CONFIG_MP_INCLUDED = n
+ CONFIG_POWER_SAVING = n
+ CONFIG_IPS_MODE = default
+ CONFIG_LPS_MODE = default
+@@ -79,10 +81,10 @@
+ CONFIG_HW_PWRP_DETECTION = n
+ CONFIG_BT_COEXIST = n
+ CONFIG_WAPI_SUPPORT = n
+-CONFIG_EFUSE_CONFIG_FILE = y
++CONFIG_EFUSE_CONFIG_FILE = n
+ CONFIG_EXT_CLK = n
+ CONFIG_TRAFFIC_PROTECT = n
+-CONFIG_LOAD_PHY_PARA_FROM_FILE = y
++CONFIG_LOAD_PHY_PARA_FROM_FILE = n
+ CONFIG_TXPWR_BY_RATE = y
+ CONFIG_TXPWR_BY_RATE_EN = y
+ CONFIG_TXPWR_LIMIT = y
+@@ -136,7 +138,7 @@
+ endif
+ 
+ ########################## Debug ###########################
+-CONFIG_RTW_DEBUG = y
++CONFIG_RTW_DEBUG = n
+ # default log level is _DRV_INFO_ = 4,
+ # please refer to "How_to_set_driver_debug_log_level.doc" to set the available level.
+ CONFIG_RTW_LOG_LEVEL = 4
+@@ -213,7 +215,7 @@
+ CONFIG_PLATFORM_MSTAR_TITANIA12 = n
+ CONFIG_PLATFORM_MSTAR = n
+ CONFIG_PLATFORM_SZEBOOK = n
+-CONFIG_PLATFORM_ARM_SUNxI = y
++CONFIG_PLATFORM_ARM_SUNxI = n
+ CONFIG_PLATFORM_ARM_SUN6I = n
+ CONFIG_PLATFORM_ARM_SUN7I = n
+ CONFIG_PLATFORM_ARM_SUN8I_W3P1 = n
+diff --git a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c
+--- a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c
++++ b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c
+@@ -200,8 +200,8 @@
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
+ 	if (started) {
+-#if defined(CONFIG_MLD_KERNEL_PATCH)
+-		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, 0, false);
++#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
++		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0, 0, false, 0);
+ #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0))
+ 
+ 		/* --- cfg80211_ch_switch_started_notfiy() ---
+@@ -224,7 +224,7 @@
+ 		goto exit;
+ 
+ #if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
+-	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
++	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0, 0);
+ #else
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
+ #endif
+@@ -902,7 +902,7 @@
+ 		#endif
+ 
+ 		#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
+-		#if defined(CONFIG_MLD_KERNEL_PATCH)
++		#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ 		roam_info.links[0].bssid = cur_network->network.MacAddress;
+ 		#else	
+ 		roam_info.bssid = cur_network->network.MacAddress;
+@@ -1702,7 +1702,7 @@
+ }
+ 
+ static int cfg80211_rtw_add_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ 	, int link_id
+ #endif
+ 	, u8 key_index
+@@ -1867,7 +1867,7 @@
+ }
+ 
+ static int cfg80211_rtw_get_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ 	, int link_id
+ #endif
+ 	, u8 keyid
+@@ -2058,7 +2058,7 @@
+ }
+ 
+ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ 	, int link_id
+ #endif
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
+@@ -2081,7 +2081,7 @@
+ }
+ 
+ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ 	, int link_id
+ #endif
+ 	, u8 key_index
+@@ -2132,7 +2132,7 @@
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
+ int cfg80211_rtw_set_default_mgmt_key(struct wiphy *wiphy, struct net_device *ndev
+-#ifdef CONFIG_MLD_KERNEL_PATCH
++#if defined(CONFIG_MLD_KERNEL_PATCH) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ 	, int link_id
+ #endif
+ 	, u8 key_index)
+@@ -10900,7 +10900,7 @@
+ 
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)) || defined(COMPAT_KERNEL_RELEASE)
+ 	#if (defined(CONFIG_MLD_KERNEL_PATCH) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)))
+-	if (wdev->valid_links && wdev->links[0].client.current_bss)
++	if (wdev->links[0].client.current_bss)
+ 	#else
+ 	if (wdev->current_bss)
+ 	#endif
+diff --git a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c
+--- a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c
++++ b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c
+@@ -1809,7 +1809,7 @@
+ 	}
+ 
+ 	_rtw_memcpy(adapter_mac_addr(padapter), sa->sa_data, ETH_ALEN); /* set mac addr to adapter */
+-	_rtw_memcpy(pnetdev->dev_addr, sa->sa_data, ETH_ALEN); /* set mac addr to net_device */
++	eth_hw_addr_set(pnetdev, sa->sa_data); /* set mac addr to net_device */
+ 
+ 	rtw_hal_set_hw_macaddr(padapter, sa->sa_data);
+ 
+@@ -2316,7 +2316,7 @@
+ 	u8 rtnl_lock_needed = rtw_rtnl_lock_needed(dvobj);
+ 
+ #ifdef CONFIG_RTW_NAPI
+-	netif_napi_add(ndev, &adapter->napi, rtw_recv_napi_poll, RTL_NAPI_WEIGHT);
++	netif_napi_add_weight(ndev, &adapter->napi, rtw_recv_napi_poll, RTL_NAPI_WEIGHT);
+ #endif /* CONFIG_RTW_NAPI */
+ 
+ #if defined(CONFIG_IOCTL_CFG80211)
+@@ -2336,7 +2336,7 @@
+ 	/* alloc netdev name */
+ 	rtw_init_netdev_name(ndev, name);
+ 
+-	_rtw_memcpy(ndev->dev_addr, adapter_mac_addr(adapter), ETH_ALEN);
++	eth_hw_addr_set(ndev, adapter_mac_addr(adapter));
+ 
+ 	/* Tell the network stack we exist */
+ 
+@@ -3448,7 +3448,7 @@
+ 		rtw_mbid_camid_alloc(padapter, adapter_mac_addr(padapter));
+ #endif
+ 		rtw_init_wifidirect_addrs(padapter, adapter_mac_addr(padapter), adapter_mac_addr(padapter));
+-		_rtw_memcpy(pnetdev->dev_addr, adapter_mac_addr(padapter), ETH_ALEN);
++		eth_hw_addr_set(pnetdev, adapter_mac_addr(padapter));
+ 	}
+ #endif /*CONFIG_PLATFORM_INTEL_BYT*/
+ 
+@@ -4206,7 +4206,7 @@
+ 		rtw_mbid_camid_alloc(padapter, adapter_mac_addr(padapter));
+ #endif
+ 		rtw_init_wifidirect_addrs(padapter, adapter_mac_addr(padapter), adapter_mac_addr(padapter));
+-		_rtw_memcpy(pnetdev->dev_addr, adapter_mac_addr(padapter), ETH_ALEN);
++		eth_hw_addr_set(pnetdev, adapter_mac_addr(padapter));
+ #endif /* CONFIG_PLATFORM_INTEL_BYT */
+ 
+ 		rtw_clr_surprise_removed(padapter);
+diff --git a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/rtw_proc.c b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/rtw_proc.c
+--- a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/rtw_proc.c
++++ b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/rtw_proc.c
+@@ -35,7 +35,7 @@
+ #endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0))
+-#define PDE_DATA(inode) PDE((inode))->data
++#define pde_data(inode) PDE((inode))->data
+ #define proc_get_parent_data(inode) PDE((inode))->parent->data
+ #endif
+ 
+@@ -304,7 +304,7 @@
+ static int rtw_drv_proc_open(struct inode *inode, struct file *file)
+ {
+ 	/* struct net_device *dev = proc_get_parent_data(inode); */
+-	ssize_t index = (ssize_t)PDE_DATA(inode);
++	ssize_t index = (ssize_t)pde_data(inode);
+ 	const struct rtw_proc_hdl *hdl = drv_proc_hdls + index;
+ 	void *private = NULL;
+ 
+@@ -330,7 +330,7 @@
+ 
+ static ssize_t rtw_drv_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos)
+ {
+-	ssize_t index = (ssize_t)PDE_DATA(file_inode(file));
++	ssize_t index = (ssize_t)pde_data(file_inode(file));
+ 	const struct rtw_proc_hdl *hdl = drv_proc_hdls + index;
+ 	ssize_t (*write)(struct file *, const char __user *, size_t, loff_t *, void *) = hdl->write;
+ 
+@@ -5867,7 +5867,7 @@
+ 
+ static int rtw_adapter_proc_open(struct inode *inode, struct file *file)
+ {
+-	ssize_t index = (ssize_t)PDE_DATA(inode);
++	ssize_t index = (ssize_t)pde_data(inode);
+ 	const struct rtw_proc_hdl *hdl = adapter_proc_hdls + index;
+ 	void *private = proc_get_parent_data(inode);
+ 
+@@ -5893,7 +5893,7 @@
+ 
+ static ssize_t rtw_adapter_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos)
+ {
+-	ssize_t index = (ssize_t)PDE_DATA(file_inode(file));
++	ssize_t index = (ssize_t)pde_data(file_inode(file));
+ 	const struct rtw_proc_hdl *hdl = adapter_proc_hdls + index;
+ 	ssize_t (*write)(struct file *, const char __user *, size_t, loff_t *, void *) = hdl->write;
+ 
+@@ -6056,7 +6056,7 @@
+ 
+ static int rtw_odm_proc_open(struct inode *inode, struct file *file)
+ {
+-	ssize_t index = (ssize_t)PDE_DATA(inode);
++	ssize_t index = (ssize_t)pde_data(inode);
+ 	const struct rtw_proc_hdl *hdl = odm_proc_hdls + index;
+ 	void *private = proc_get_parent_data(inode);
+ 
+@@ -6082,7 +6082,7 @@
+ 
+ static ssize_t rtw_odm_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos)
+ {
+-	ssize_t index = (ssize_t)PDE_DATA(file_inode(file));
++	ssize_t index = (ssize_t)pde_data(file_inode(file));
+ 	const struct rtw_proc_hdl *hdl = odm_proc_hdls + index;
+ 	ssize_t (*write)(struct file *, const char __user *, size_t, loff_t *, void *) = hdl->write;
+ 
+@@ -6221,7 +6221,7 @@
+ 
+ static int rtw_mcc_proc_open(struct inode *inode, struct file *file)
+ {
+-	ssize_t index = (ssize_t)PDE_DATA(inode);
++	ssize_t index = (ssize_t)pde_data(inode);
+ 	const struct rtw_proc_hdl *hdl = mcc_proc_hdls + index;
+ 	void *private = proc_get_parent_data(inode);
+ 
+@@ -6247,7 +6247,7 @@
+ 
+ static ssize_t rtw_mcc_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos)
+ {
+-	ssize_t index = (ssize_t)PDE_DATA(file_inode(file));
++	ssize_t index = (ssize_t)pde_data(file_inode(file));
+ 	const struct rtw_proc_hdl *hdl = mcc_proc_hdls + index;
+ 	ssize_t (*write)(struct file *, const char __user *, size_t, loff_t *, void *) = hdl->write;
+ 
+diff --git a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/wifi_regd.c b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/wifi_regd.c
+--- a/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/wifi_regd.c
++++ b/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/wifi_regd.c
+@@ -1274,7 +1274,7 @@
+ 	wiphy->regulatory_flags &= ~REGULATORY_DISABLE_BEACON_HINTS;
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0))
+ 	wiphy->regulatory_flags |= REGULATORY_IGNORE_STALE_KICKOFF;
+ #endif
+ 
+diff --git a/bsp/drivers/net/wireless/rtl8189fs/os_dep/osdep_service.c b/bsp/drivers/net/wireless/rtl8189fs/os_dep/osdep_service.c
+--- a/bsp/drivers/net/wireless/rtl8189fs/os_dep/osdep_service.c
++++ b/bsp/drivers/net/wireless/rtl8189fs/os_dep/osdep_service.c
+@@ -1505,7 +1505,7 @@
+ inline void thread_exit(_completion *comp)
+ {
+ #ifdef PLATFORM_LINUX
+-	complete_and_exit(comp, 0);
++	kthread_complete_and_exit(comp, 0);
+ #endif
+ 
+ #ifdef PLATFORM_FREEBSD
+@@ -3200,7 +3200,7 @@
+ {
+ #ifdef PLATFORM_LINUX
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+-	return prandom_u32();
++	return get_random_u32();
+ #elif (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 18))
+ 	u32 random_int;
+ 	get_random_bytes(&random_int , 4);
 diff --git a/bsp/drivers/vin/modules/sensor/ov13850_mipi.c b/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
 --- a/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
 +++ b/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
@@ -1195,6 +1497,15 @@ diff --git a/bsp/drivers/vin/modules/sensor/ov13850_mipi.c b/bsp/drivers/vin/mod
 diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
 --- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
 +++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
+@@ -420,7 +420,7 @@
+ 	auto_print@54321 {
+ 		reg = <0x0 0x54321 0x0 0x0>;
+ 		device_type = "auto_print";
+-		status = "okay";
++		status = "disabled";
+ 	};
+ };
+ 
 @@ -581,7 +581,6 @@
  
  &sdc0 {
@@ -1203,15 +1514,34 @@ diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.
  	/*non-removable;*/
  	/*broken-cd;*/
  	/*cd-inverted*/
-@@ -607,6 +606,7 @@
+@@ -591,15 +590,10 @@
+ 	cd-used-24M;
+ 	cd-set-debounce = <0x1>;
+ 	cap-sd-highspeed;
+-	sd-uhs-sdr50;
+-	sd-uhs-ddr50;
+-	sd-uhs-sdr104;
+-	no-sdio;
+ 	no-mmc;
+ 	/* b2c-ecc-on; */
+-	sunxi-power-save-mode;
+ 	/*sunxi-dis-signal-vol-sw;*/
+-	max-frequency = <150000000>;
++	max-frequency = <25000000>;
+ 	ctl-spec-caps = <0x428>;
+ 	/*vmmc-supply = <&reg_cldo3>;*/
+ 	/*vqmmc33sw-supply = <&reg_cldo3>;*/
+@@ -607,6 +601,9 @@
  	/*vqmmc18sw-supply = <&reg_aldo4>;*/
  	/*vdmmc18sw-supply = <&reg_aldo4>;*/
  	status = "okay";
 +	broken-cd;
++	cap-sdio-irq;
++	no-1-8-v;
  };
  
  &sdc2 {
-@@ -854,17 +854,17 @@
+@@ -854,17 +851,17 @@
  	};
  
  	tdm0: tdm@5908000 {
@@ -1232,7 +1562,7 @@ diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.
  		delay_init = <0>;
  	};
  
-@@ -891,13 +891,13 @@
+@@ -891,13 +888,13 @@
  	};
  
  	scaler00:scaler@5910000 {
@@ -1248,7 +1578,7 @@ diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.
  		delay_init = <0>;
  	};
  
-@@ -996,10 +996,10 @@
+@@ -996,10 +993,10 @@
  
  	sensor0: sensor@5812000 {
  		device_type = "sensor0";
@@ -1262,7 +1592,7 @@ diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.
  		sensor0_pos = "rear";
  		sensor0_isp_used = <1>;
  		sensor0_fmt = <1>;
-@@ -1008,8 +1008,8 @@
+@@ -1008,8 +1005,8 @@
  		sensor0_hflip = <0>;
  		sensor0_iovdd-supply = <>;
  		sensor0_iovdd_vol = <>;
@@ -1273,7 +1603,7 @@ diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.
  		sensor0_dvdd-supply = <>;
  		sensor0_dvdd_vol = <>;
  		sensor0_power_en = <>;
-@@ -1123,8 +1123,8 @@
+@@ -1123,8 +1120,8 @@
  	};
  
  	vinc00:vinc@5830000 {
@@ -1284,7 +1614,7 @@ diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.
  		vinc0_isp_sel = <0>;
  		vinc0_isp_tx_ch = <0>;
  		vinc0_tdm_rx_sel = <0>;
-@@ -1133,22 +1133,22 @@
+@@ -1133,22 +1130,22 @@
  		vinc0_front_sensor_sel = <0>;
  		vinc0_sensor_list = <0>;
  		delay_init = <0>;
@@ -1333,6 +1663,15 @@ diff --git a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_de
  CONFIG_SND_SOC_SUNXI_DEBUG=y
  CONFIG_SND_SOC_SUNXI_AAUDIO=y
  CONFIG_SND_SOC_SUNXI_I2S=y
+@@ -277,3 +279,8 @@
+ CONFIG_DYNAMIC_DEBUG=y
+ CONFIG_FRAME_WARN=2048
+ # CONFIG_RCU_TRACE is not set
++
++CONFIG_CFG80211=m
++CONFIG_CFG80211_WEXT=y
++CONFIG_RTL8189FS=m
++# CONFIG_RFKILL is not set
 diff --git a/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh b/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
 --- a/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
 +++ b/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
@@ -1397,6 +1736,17 @@ new file mode 100755
 +mkdir -p /mnt/SDCARD
 +pidof mdev >/dev/null || /sbin/mdev -d
 +/sbin/mdev -s
+diff --git a/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S06tfwifi b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S06tfwifi
+new file mode 100755
+--- /dev/null
++++ b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S06tfwifi
+@@ -0,0 +1,6 @@
++#!/bin/sh
++# Register the SDIO driver; the kernel binds it only to matching WiFi cards.
++[ "$1" = "start" ] || exit 0
++MODULES_DIR="/lib/modules/$(uname -r)"
++[ -d /sys/module/cfg80211 ] || insmod "$MODULES_DIR/cfg80211.ko" || exit 1
++[ -d /sys/module/8189fs ] || insmod "$MODULES_DIR/8189fs.ko"
 diff --git a/openwrt/target/v861/v861-avaota_f2/defconfig b/openwrt/target/v861/v861-avaota_f2/defconfig
 --- a/openwrt/target/v861/v861-avaota_f2/defconfig
 +++ b/openwrt/target/v861/v861-avaota_f2/defconfig
@@ -1441,10 +1791,16 @@ diff --git a/openwrt/target/v861/v861-avaota_f2/defconfig b/openwrt/target/v861/
  # CONFIG_PACKAGE_kmod-sensor-sc231hai is not set
  # CONFIG_PACKAGE_kmod-sensor-sc2337p is not set
  # CONFIG_PACKAGE_kmod-sensor-sc235hai is not set
+@@ -6777,3 +6784,5 @@
+ # CONFIG_ENABLE_OPENCV_AWISPAPI is not set
+ # CONFIG_ENABLE_OPENCV_OPENMP is not set
+ # end of Vision
++
++CONFIG_PACKAGE_kmod-tf-rtl8189fs=y
 diff --git a/openwrt/target/v861/v861-avaota_f2/modules.mk b/openwrt/target/v861/v861-avaota_f2/modules.mk
 --- a/openwrt/target/v861/v861-avaota_f2/modules.mk
 +++ b/openwrt/target/v861/v861-avaota_f2/modules.mk
-@@ -3,3 +3,13 @@
+@@ -3,3 +3,25 @@
  #
  # This is free software, licensed under the GNU General Public License v2.
  # See /build/LICENSE for more information.
@@ -1458,6 +1814,18 @@ diff --git a/openwrt/target/v861/v861-avaota_f2/modules.mk b/openwrt/target/v861
 +endef
 +
 +$(eval $(call KernelPackage,sensor-ov13850))
++
++# Use BSP-native cfg80211 and RTL8189FS from this kernel, not backports.
++define KernelPackage/tf-rtl8189fs
++	SUBMENU:=$(WIRELESS_MENU)
++	TITLE:=Avaota F2 removable TF RTL8189FS SDIO WiFi
++	KCONFIG:=CONFIG_CFG80211=m CONFIG_CFG80211_WEXT=y CONFIG_RTL8189FS=m
++	FILES:= \
++		$(CONFIG_EXTERNAL_KERNEL_TREE)/net/wireless/cfg80211.ko \
++		$(CONFIG_EXTERNAL_KERNEL_TREE)/bsp/drivers/net/wireless/rtl8189fs/8189fs.ko
++endef
++
++$(eval $(call KernelPackage,tf-rtl8189fs))
 diff --git a/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h b/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h
 new file mode 100644
 --- /dev/null

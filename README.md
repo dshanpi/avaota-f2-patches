@@ -13,14 +13,18 @@
 
 本轮实测结果和限制见 [多模式验证记录](docs/multimode-validation.md)。采集帧率不代表编码帧率，原厂 ISP 参数复用不代表各分辨率均完成了独立画质标定。
 
+## TF 插槽 WiFi
+
+新增 RTL8189FS TF 接口 SDIO WiFi：同一插槽使用普通 FAT32 存储卡时自动挂载，换成 WiFi 卡后上电自动加载匹配内核模块并创建无线接口。驱动在开机时注册，内核按卡类型绑定；无需手工 insmod。使用与验收步骤见 [TF 卡 WiFi 最小适配](docs/tf-wifi.md)。当前轮次的验证状态见 [干净 SDK 验证记录](docs/tf-wifi-validation.md)。
+
 ## 预编译固件和测试应用
 
-可以从 [v0.1.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.1.0) 下载匹配固件、采集应用和测试配置，使用 `run.sh <模式> save|stream` 存图或测持续收帧。完整步骤见 [Release 摄像头测试说明](docs/camera-test-v0.1.0.md)。
+v0.1.0 为先前摄像头版本，**不含本次 TF WiFi 适配**。可以从 [v0.1.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.1.0) 下载匹配固件、采集应用和测试配置，使用 `run.sh <模式> save|stream` 存图或测持续收帧。完整步骤见 [Release 摄像头测试说明](docs/camera-test-v0.1.0.md)。
 
 ## 仓库内容与修改范围
 
 ```text
-source/                 13 个完整源文件，保留 SDK 相对路径
+source/                 20 个完整源文件，保留 SDK 相对路径
 patches/                原始 SDK 完整补丁和指定版本增量补丁
 test/modes/             7 档模式，各一份存图和一份持续收帧配置
 test/sample_virvi-multimode.patch  4K/720p 采集示例的独立补丁
@@ -28,11 +32,11 @@ test/                   保留原有 2K 测试配置
 docs/changes.md         每个修改文件的用途
 docs/multimode-validation.md      本轮多模式测试记录
 docs/clean-sdk-with-sd-validation.md  先前 2K + TF 卡干净 SDK 复现
-source-manifest.json    13 个源文件的 SHA-256
+source-manifest.json    20 个源文件的 SHA-256
 SHA256SUMS              source/、patches/、test/ 校验值
 ```
 
-相对已验证的 2K+TF 卡基线 `ca43209`，只改四个 SDK 文件：Sensor 模式表、ISP 配置匹配表、板级设备树、BSP defconfig。原厂 ISP 头文件和原有 2K 寄存器表保持不变，保留原板级 50MiB 视频内存池；没有修改 VIN/TDM/VIPP/ISP 内核公共实现、CCI 或内存分配器。
+摄像头多模式部分相对已验证的 2K+TF 卡基线 `ca43209`，只改四个 SDK 文件：Sensor 模式表、ISP 配置匹配表、板级设备树、BSP defconfig。原厂 ISP 头文件和原有 2K 寄存器表保持不变，保留原板级 50MiB 视频内存池；没有修改 VIN/TDM/VIPP/ISP 内核公共实现、CCI 或内存分配器。
 
 4K/720p 另需采集程序的两处配置，见下文。仓库不包含完整 SDK、预编译固件或采集程序。
 
@@ -56,19 +60,11 @@ cp -a "$PATCH_DIR/source/." "$SDK_DIR/"
 
 ```bash
 cd "$SDK_DIR"
-git apply --check "$PATCH_DIR/patches/avaota-f2-ov13850-sd.patch"
-git apply "$PATCH_DIR/patches/avaota-f2-ov13850-sd.patch"
+git apply --check "$PATCH_DIR/patches/avaota-f2-ov13850-sd-wifi.patch"
+git apply "$PATCH_DIR/patches/avaota-f2-ov13850-sd-wifi.patch"
 ```
 
-若 SDK 已完整应用 `ca43209` 的 2K+TF 卡配置，则可用以下四文件增量补丁代替完整补丁：
-
-```bash
-cd "$SDK_DIR"
-git apply --check "$PATCH_DIR/patches/avaota-f2-ov13850-multimode-from-ca43209.patch"
-git apply "$PATCH_DIR/patches/avaota-f2-ov13850-multimode-from-ca43209.patch"
-```
-
-`git apply` 不要求 SDK 本身是 Git 仓库。检查失败时先核对版本和已有修改，不要强行套用或重复应用。旧 `avaota-f2-sd-poll-automount.patch` 仅供 `b61eff6` 增加 SD 支持，不能用它升级到多模式版本。
+若 SDK 已完整应用 `v0.1.0`，可使用 `patches/avaota-f2-tf-wifi-from-v0.1.0.patch` 的 11 文件增量，具体命令见 [TF WiFi 说明](docs/tf-wifi.md)。文件替换、完整补丁、对应版本增量补丁择一，不要重复应用。旧的 SD-only 和 ca43209 多模式增量保留作历史参考，不包含本次 WiFi 适配。
 
 ## 编译固件与采集程序
 
@@ -159,6 +155,8 @@ adb shell 'cat /proc/uptime; cat /sys/kernel/debug/mpp/vi; cat /proc/uptime' > v
 MMC 使用轮询检测，BusyBox mdev 复用 SDK 挂载脚本。FAT32 单分区卡挂载到 `/mnt/SDCARD`；可用 `grep mmc /proc/mounts`、`df -h /mnt/SDCARD` 检查。
 
 拔卡前先停止采集和写入，再执行 `sync; umount /mnt/SDCARD`。自动识别不代表写入时可直接拔卡。轮询无卡时可能出现 MMC 超时日志。详情见 [SD 卡说明](docs/sd-card.md)。
+
+当前 `source/` 另包含 TF WiFi 的 11 文件增量，详情见 TF WiFi 文档；其中设备树、BSP defconfig、OpenWrt defconfig、modules.mk 与摄像头/SD 配置共同维护。
 
 ## 硬件和已知边界
 
