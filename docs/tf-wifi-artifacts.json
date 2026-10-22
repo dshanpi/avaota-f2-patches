@@ -1,0 +1,39 @@
+{
+  "source_commit": "9fc7f6c06049c1cf81020d9f60e505f09fa718ed",
+  "source_files_verified": 20,
+  "normalized_config_files": [
+    {
+      "path": "openwrt/target/v861/v861-avaota_f2/defconfig",
+      "reason": "SDK moved the new module selection into its sorted package section; all config values identical"
+    }
+  ],
+  "modules": {
+    "cfg80211": {
+      "bytes": 472736,
+      "sha256": "23cc67830fbbf9b30648baa47a29322eeacbcbd7155bf2842a0bb2722be37197",
+      "vermagic": "6.6.0 SMP mod_unload riscv"
+    },
+    "8189fs": {
+      "bytes": 1609976,
+      "sha256": "b8a87355d8f27260b5fceae81ab2637a9c88dbed2b9708a5e189f603dc9751b8",
+      "vermagic": "6.6.0 SMP mod_unload riscv"
+    }
+  },
+  "sdio_alias": "sdio:c*v024CdF179*",
+  "sdio_dtb_verified": true,
+  "startup_scripts_verified": true,
+  "partition_sizes": {
+    "boot": {
+      "image_bytes": 5963776,
+      "partition_bytes": 5963776,
+      "free_bytes": 0
+    },
+    "rootfs": {
+      "image_bytes": 4849664,
+      "partition_bytes": 5767168,
+      "free_bytes": 917504
+    }
+  },
+  "image_bytes": 15601664,
+  "image_sha256": "0bdde8321ca0062ac252b1e568010da70f299b6401ecddda4f86e8e44de46d55"
+}

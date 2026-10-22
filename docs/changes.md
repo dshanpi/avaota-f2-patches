@@ -1,6 +1,6 @@
 # 修改文件
 
-相对未适配的 SDK 共 13 个文件；`source/` 保存修改后的完整文件，补丁与这些文件一致。
+相对未适配的 SDK 共 20 个文件；`source/` 保存修改后的完整文件，补丁与这些文件一致。
 
 ## `bsp/drivers/vin/modules/sensor/ov13850_mipi.c`
 
@@ -69,3 +69,9 @@ SD 部分相对 `b61eff6` 只涉及四个文件（两个已有摄像头板级文
 仅上述 Sensor、board.dts、bsp_defconfig、isp_ini_parse.c 四个 SDK 源文件改变。其余九个文件保持字节一致，SD 逻辑和原厂 ISP 头文件未改。完整补丁为 `patches/avaota-f2-ov13850-sd.patch`；四文件增量为 `patches/avaota-f2-ov13850-multimode-from-ca43209.patch`。
 
 `test/sample_virvi-multimode.patch` 是独立的应用示例补丁，不在 `source/` 或四文件增量中：4K 请求两个 YUV 缓冲；720p 在 ISP 启动前使用现有 `AW_MPI_ISP_SetD3dLbcRatio(isp, 100)` 接口。没有引入新的模块参数或内核公共代码补丁。
+
+## TF 接口 WiFi 增量
+
+相对 v0.1.0，本轮另外适配 RTL8189FS：六个已有驱动文件的 RISC-V/Linux 6.6 兼容、board.dts 的 SDIO 与 auto_print、BSP 和 OpenWrt defconfig、modules.mk，以及新的六行 S06tfwifi 启动脚本，共 11 个文件、391 行增量补丁。与摄像头部分共同维护的文件没有另建重复副本。所有详细路径见 [TF WiFi 说明](tf-wifi.md)。
+
+WiFi 模块位于 NOR rootfs，不依赖 TF 卡文件系统。模块每次开机注册，内核按 SDIO ID 匹配；普通 TF 卡仍复用 S05mdev 和原有挂载脚本。相机驱动及 ISP 文件在本轮没有变化。没有修改 MMC 公共驱动或分区表。
