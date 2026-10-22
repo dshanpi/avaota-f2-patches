@@ -1,0 +1,7 @@
+# Preserve vendor header bytes and mixed line endings inside the patch.
+source/** -text
+patches/** -text
+*.md text eol=lf
+*.json text eol=lf
+test/*.conf text eol=lf
+SHA256SUMS text eol=lf
