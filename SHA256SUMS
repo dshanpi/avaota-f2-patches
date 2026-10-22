@@ -1,7 +1,7 @@
 5a7ec9b81c9ca7e0cfeebe1506b47cb18859d8c927873a911098e9ab4494e172  patches/avaota-f2-ov13850-multimode-from-ca43209.patch
 0186fbd52d7be53b842dde05607a4b78d9b9e76a83f042dd4ef4d3e5c23fc22d  patches/avaota-f2-ov13850-sd-wifi.patch
 f341a605338eca04216e267e12be951389803872e445758c1d1852526d0c160f  patches/avaota-f2-sd-poll-automount.patch
-31f73360208e766ae475dbccb94f9972327dc2f75adbc6c12a6acb2731d335e2  patches/avaota-f2-tf-wifi-from-v0.1.0.patch
+bda57a3edac4f359a5fcd1f81708fdec4329c3f94565bbc5a69b6dd6e8dc5880  patches/avaota-f2-tf-wifi-from-v0.1.0.patch
 5fca33fd9686d6b7042a9ce2225cc9667ec55b0343de2b7143d8fce5c3a16d96  source/bsp/drivers/net/wireless/rtl8189fs/Makefile
 088e11665b80d39698acd0becdeba54d5ec37352838b00cf1dddca933cc5c9cd  source/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c
 6a95a1c6d6e94b5824c879fa9e941ad4a8d4434c0a783e41a491fcf0b10002e3  source/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c
