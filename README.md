@@ -9,14 +9,23 @@
 ```text
 source/                 修改后的完整文件，保留 SDK 相对路径，共 11 个
 patches/                相对未适配 SDK 的完整差异补丁
-test/                   2K30 / 2K60 单路采集配置
+test/                   2K30 / 2K60 出图与持续收帧配置
 docs/changes.md         修改文件及用途
 docs/validation.md      测试结果和已知限制
+docs/clean-sdk-validation.md  干净 SDK 编译与上板复现记录
 source-manifest.json    11 个修改文件的 SHA-256
 SHA256SUMS              source/、patches/、test/ 文件校验值
 ```
 
 本仓库提供 SDK 源文件和补丁，不包含完整 SDK、预编译固件或采集程序。
+
+克隆仓库需要相应的 GitHub 访问权限。若 HTTPS 提示需要用户名/认证，请先配置访问凭据，
+或在已配置 SSH 密钥的环境中改用：
+
+```bash
+git clone git@github.com:dshanpi/avaota-f2-ov13850-patches.git "$HOME/Downloads/avaota-f2-ov13850-patches"
+```
+
 
 ## 使用方法一：直接替换文件（推荐）
 
@@ -52,6 +61,10 @@ git apply "$PATCH_DIR/patches/ov13850-2k-with-vendor-isp.patch"
 `git apply` 不要求 SDK 本身是 Git 仓库。若检查失败，先确认 SDK 版本和现有修改，不要强行套用。该补丁同时包含 Sensor、板级配置和原厂 ISP 接入。
 
 ## 编译
+
+本次复现使用已安装 SDK 编译依赖的 Ubuntu 24.04.4 LTS 主机，SDK 从原始压缩包重新解压。
+请先按 SDK 文档准备宿主编译环境。首次运行 `./build.sh` 会显示 SDK 声明并等待交互确认；
+请在终端中阅读并按提示选择，不要在这一阶段关闭标准输入。
 
 首次配置使用：
 
@@ -113,6 +126,35 @@ find ov13850_mipi_2560_1440_30_0 [ov13850_mipi_isp610_20261021_195907] isp confi
 
 60fps 应匹配 `_60_0`。采集过程中 `/sys/kernel/debug/mpp/isp` 也应显示相同 ISP 配置名。
 
+### 持续收帧与帧率检查
+
+`isp-30.conf` / `isp-60.conf` 用于保存图片。SDK 原版 `sample_virvi` 在保存完指定的一张图后，
+仍然执行整帧 `memcpy` 和存图缓冲清零，因此会增加 CPU/内存开销，实测有明显 `lost_cnt` 增长。
+不能用这两份存图配置证明业务程序能够持续交付 30/60fps。
+
+检查持续收帧时使用 `stream-30.conf` / `stream-60.conf`：它们只关闭存图路径
+（`save_pic_dev=-1`、`yuv_frm_count=0`、`save_pic_buffer_num=0`），驱动、ISP 和采集程序不变。
+这两份配置不输出图片。
+
+```bash
+adb push "$PATCH_DIR/test/stream-60.conf" /tmp/isp-test.conf
+adb shell 'LD_LIBRARY_PATH=/usr/lib/eyesee-mpp:/usr/lib /tmp/sample_virvi -path /tmp/isp-test.conf'
+```
+
+程序运行共 35 秒。在另一个主机终端中，等待开流约 10 秒后采样：
+
+```bash
+adb shell 'cat /proc/uptime; cat /sys/kernel/debug/mpp/vi; cat /proc/uptime' > vi-a.txt
+sleep 20
+adb shell 'cat /proc/uptime; cat /sys/kernel/debug/mpp/vi; cat /proc/uptime' > vi-b.txt
+```
+
+取两次 `vi0` 的 `frame => cnt` 差值，除以两次 uptime 的差值，可估算 VI 帧率；
+每次 uptime 用文件首末两行第一列的平均值。同时比较 `lost_cnt`、`error_cnt` 增量。
+VI 计数反映硬件采集节奏，不等同于应用 PTS 帧率或编码帧率。
+本次无存图测试约 20 秒统计窗口内测得约 30/60fps，两个计数均未增加。
+完整结果见 [干净 SDK 复现记录](docs/clean-sdk-validation.md)。
+
 ## 硬件与范围
 
 - 测试模组：DshanPI_CAM-OV13850-V1.0，经转接板连接 Avaota F2 四 Lane 接口。
@@ -129,6 +171,10 @@ find ov13850_mipi_2560_1440_30_0 [ov13850_mipi_isp610_20261021_195907] isp confi
 
 ## 验证状态
 
+已从原始 SDK 压缩包全新解压，按本文命令完成全量编译、打包、烧录校验和原版示例出图。
+新增持续收帧配置也已上板测试；见 [干净 SDK 复现记录](docs/clean-sdk-validation.md)。
+
+
 2026-10-22 白色天花板场景短测：2K30 约 **29.97fps**，2K60 约 **59.89fps**，均能获取完整图像；新 ISP 相比此前临时使用的 GC2083 参数，明显改善绿偏和噪声。
 
-原厂参数标注为 1440p60；1440p30 共用同一套参数。短时存图仍有少量丢帧，且存在原厂参数与 SDK 的 AWB 字段兼容性告警。具体结果和边界见 [验证记录](docs/validation.md)。本仓库不宣称已完成零丢帧编码、长时间录制或完整 ISP 画质验收。
+原厂参数标注为 1440p60；1440p30 共用同一套参数。此前调试采集工具短测有少量丢帧；原版示例存图路径的丢帧更多，持续收帧请用上面的 stream 配置。原厂参数与 SDK 的 AWB 字段兼容性告警仍存在。具体结果和边界见 [验证记录](docs/validation.md)。本仓库不宣称已完成零丢帧编码、长时间录制或完整 ISP 画质验收。
