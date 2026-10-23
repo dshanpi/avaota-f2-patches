@@ -80,6 +80,10 @@ wpa_cli -p /tmp/wpa_supplicant -i wlan0 terminate
 
 ## 预编译固件和测试应用
 
+[v0.2.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.2.0) 提供 **TF WiFi 联网版固件**、完整源码与补丁、WiFi 连接方法及实测记录，并附带沿用 v0.1.0 的摄像头测试应用。下载后先校验 Release 的 SHA256SUMS，烧录完整新固件。独立 WiFi 操作说明见 [WIFI_CONNECT](docs/wifi-connect-v0.2.0.md)。
+
+同一插槽不能同时插普通 TF 卡和 SDIO WiFi 卡。摄像头测试包原脚本使用 `/mnt/SDCARD` 保存图片，运行它时需换回普通存储卡；本轮主要新增联网测试，没有重复进行全部摄像头模式的图像验收。
+
 v0.1.0 为先前摄像头版本，**不含本次 TF WiFi 适配**。可以从 [v0.1.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.1.0) 下载匹配固件、采集应用和测试配置，使用 `run.sh <模式> save|stream` 存图或测持续收帧。完整步骤见 [Release 摄像头测试说明](docs/camera-test-v0.1.0.md)。
 
 ## 仓库内容与修改范围
