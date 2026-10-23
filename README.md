@@ -1,6 +1,6 @@
 # Avaota F2 适配补丁
 
-基于 **Tina V861 v1.1 / Avaota F2 NOR / Linux 6.6 Xuantie**，提供 OV13850 四 Lane RAW10 BGGR 驱动、原厂 ISP610 参数接入，以及 TF 卡自动识别和挂载。
+基于 **Tina V861 v1.1 / Avaota F2 NOR / Linux 6.6 Xuantie**，提供 OV13850 四 Lane RAW10 BGGR 驱动、原厂 ISP610 参数接入，以及 TF 卡自动识别/挂载、RTL8189FS TF 接口 WiFi 自动驱动加载。
 
 | 模式 | Sensor 输出 | 帧率 | 采集通路 |
 |---|---|---|---|
@@ -90,7 +90,7 @@ cp openwrt/target/v861/v861-avaota_f2/defconfig openwrt/openwrt/.config
 ./build.sh pack
 ```
 
-烧录 `out/v861_linux_avaota_f2_uart0_nor.img`。首次应用设备树/内核配置需要完整新固件。若经 Windows 手工复制文件，还需确认 `S05mdev` 保留执行权限。
+烧录 `out/v861_linux_avaota_f2_uart0_nor.img`。首次应用设备树/内核配置需要完整新固件。若经 Windows 手工复制文件，还需确认 `S05mdev`、`S06tfwifi` 保留执行权限。
 
 ISP 参数静态链接进业务程序：只替换 `ov13850_mipi.ko` 或把 `.h` 传到板端不会更新 ISP。固件默认不安装 MPP 示例，需要单独传输。只重新编译 ISP 和示例可执行：
 

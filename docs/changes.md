@@ -66,7 +66,7 @@ SD 部分相对 `b61eff6` 只涉及四个文件（两个已有摄像头板级文
 
 ## 相对 ca43209 的多模式增量
 
-仅上述 Sensor、board.dts、bsp_defconfig、isp_ini_parse.c 四个 SDK 源文件改变。其余九个文件保持字节一致，SD 逻辑和原厂 ISP 头文件未改。完整补丁为 `patches/avaota-f2-ov13850-sd.patch`；四文件增量为 `patches/avaota-f2-ov13850-multimode-from-ca43209.patch`。
+仅上述 Sensor、board.dts、bsp_defconfig、isp_ini_parse.c 四个 SDK 源文件改变。其余九个文件保持字节一致，SD 逻辑和原厂 ISP 头文件未改。该阶段的 SD-only 完整补丁现已由 `patches/avaota-f2-ov13850-sd-wifi.patch` 取代；保留的四文件增量为 `patches/avaota-f2-ov13850-multimode-from-ca43209.patch`。
 
 `test/sample_virvi-multimode.patch` 是独立的应用示例补丁，不在 `source/` 或四文件增量中：4K 请求两个 YUV 缓冲；720p 在 ISP 启动前使用现有 `AW_MPI_ISP_SetD3dLbcRatio(isp, 100)` 接口。没有引入新的模块参数或内核公共代码补丁。
 
