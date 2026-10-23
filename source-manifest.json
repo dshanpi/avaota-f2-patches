@@ -36,6 +36,10 @@
     "sha256": "6a7081d352ef0d3031e8d54bed15a982c6b20aa2883a95f6c137794188bd8aab"
   },
   {
+    "path": "openwrt/openwrt/package/network/services/hostapd/Makefile",
+    "sha256": "df8500a7dc61e1d62956a08541d610d9e18bf4259769df6e48679b544cb1bfe0"
+  },
+  {
     "path": "openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh",
     "sha256": "513e1ffa17f2d2134ab1eced5d22d13ce9ecb77a3d3d725eed5b7d082a1d7a83"
   },
@@ -61,7 +65,7 @@
   },
   {
     "path": "openwrt/target/v861/v861-avaota_f2/defconfig",
-    "sha256": "e658f3d2d91c7ac562a99ffed5d006c67721deb5c8e30ac01492501739b8199b"
+    "sha256": "120e4630a5ca6c4575e45fe802c844392898a96eda6435437f948c97f5c5ac01"
   },
   {
     "path": "openwrt/target/v861/v861-avaota_f2/modules.mk",

@@ -1,7 +1,8 @@
 5a7ec9b81c9ca7e0cfeebe1506b47cb18859d8c927873a911098e9ab4494e172  patches/avaota-f2-ov13850-multimode-from-ca43209.patch
-0186fbd52d7be53b842dde05607a4b78d9b9e76a83f042dd4ef4d3e5c23fc22d  patches/avaota-f2-ov13850-sd-wifi.patch
+88f0cccaab4460211f793a9fc7ae84b682a75b953096ab165e3e8f4508eabf56  patches/avaota-f2-ov13850-sd-wifi.patch
 f341a605338eca04216e267e12be951389803872e445758c1d1852526d0c160f  patches/avaota-f2-sd-poll-automount.patch
-bda57a3edac4f359a5fcd1f81708fdec4329c3f94565bbc5a69b6dd6e8dc5880  patches/avaota-f2-tf-wifi-from-v0.1.0.patch
+9f5acaf0781aa06f97d8f261fa25ca186f569f12bfe83356d1ef2927029c2b68  patches/avaota-f2-tf-wifi-from-v0.1.0.patch
+507055004ebb1d712147f80205384efa0654af546f4e12efb658212056d2e60c  patches/avaota-f2-wifi-network-from-b01d6da.patch
 5fca33fd9686d6b7042a9ce2225cc9667ec55b0343de2b7143d8fce5c3a16d96  source/bsp/drivers/net/wireless/rtl8189fs/Makefile
 088e11665b80d39698acd0becdeba54d5ec37352838b00cf1dddca933cc5c9cd  source/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c
 6a95a1c6d6e94b5824c879fa9e941ad4a8d4434c0a783e41a491fcf0b10002e3  source/bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c
@@ -11,13 +12,14 @@ bda57a3edac4f359a5fcd1f81708fdec4329c3f94565bbc5a69b6dd6e8dc5880  patches/avaota
 4abaf52cf80c78fd36873f4d3c83be09d9dc264e9c691a4052aebbe6a8677632  source/bsp/drivers/vin/modules/sensor/ov13850_mipi.c
 e6c8a9a15a54faec5a42607bac80bd493ee3612a94de2cb41ad5d6bc4bf1b559  source/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
 6a7081d352ef0d3031e8d54bed15a982c6b20aa2883a95f6c137794188bd8aab  source/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
+df8500a7dc61e1d62956a08541d610d9e18bf4259769df6e48679b544cb1bfe0  source/openwrt/openwrt/package/network/services/hostapd/Makefile
 513e1ffa17f2d2134ab1eced5d22d13ce9ecb77a3d3d725eed5b7d082a1d7a83  source/openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh
 308cfbb6ab2ed5b0b539b58808816ba570c30741638868d3928be9b11d231498  source/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/Config.in
 82a48b37d76df4c9b11b68c7fce6c7c640b63e959c792e056bad0fc26c2d556c  source/openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/libisp_config.mk
 5a99b1e70667357ee4b5aae959fd046f883d734b84791732df9918b655b9bc5b  source/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp
 1fed2137f1fb26d9214e249fabdaba72659dc2ca03ec3fba3f2bccd3e7d4fd95  source/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev
 7f7bf86865d0af4d53fdcce57dff0734986b726fb915dc69bd37cc16aef58b51  source/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S06tfwifi
-e658f3d2d91c7ac562a99ffed5d006c67721deb5c8e30ac01492501739b8199b  source/openwrt/target/v861/v861-avaota_f2/defconfig
+120e4630a5ca6c4575e45fe802c844392898a96eda6435437f948c97f5c5ac01  source/openwrt/target/v861/v861-avaota_f2/defconfig
 68c31d01b16542011e0fd3fc14f15b31af0cebb38f94aff9ee1671db1d8718ac  source/openwrt/target/v861/v861-avaota_f2/modules.mk
 752f97c6725d2f27b0fc5cdd871cc6219d224564012cd52f966b7e1d1d43adb5  source/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h
 cea76c4352779351232c55c132182efd6e3bb2cf2f722cf8d374bab96cf94b09  source/platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c

@@ -1,6 +1,6 @@
 # 修改文件
 
-相对未适配的 SDK 共 20 个文件；`source/` 保存修改后的完整文件，补丁与这些文件一致。
+相对未适配的 SDK 共 21 个文件；`source/` 保存修改后的完整文件，补丁与这些文件一致。
 
 ## `bsp/drivers/vin/modules/sensor/ov13850_mipi.c`
 
@@ -72,6 +72,15 @@ SD 部分相对 `b61eff6` 只涉及四个文件（两个已有摄像头板级文
 
 ## TF 接口 WiFi 增量
 
-相对 v0.1.0，本轮另外适配 RTL8189FS：六个已有驱动文件的 RISC-V/Linux 6.6 兼容、board.dts 的 SDIO 与 auto_print、BSP 和 OpenWrt defconfig、modules.mk，以及新的六行 S06tfwifi 启动脚本，共 11 个文件、391 行增量补丁。与摄像头部分共同维护的文件没有另建重复副本。所有详细路径见 [TF WiFi 说明](tf-wifi.md)。
+相对 v0.1.0，本轮另外适配 RTL8189FS：六个已有驱动文件的 RISC-V/Linux 6.6 兼容、board.dts 的 SDIO 与 auto_print、BSP 和 OpenWrt defconfig、modules.mk，以及新的六行 S06tfwifi 启动脚本，共 12 个文件、447 行增量补丁。与摄像头部分共同维护的文件没有另建重复副本。所有详细路径见 [TF WiFi 说明](tf-wifi.md)。
 
 WiFi 模块位于 NOR rootfs，不依赖 TF 卡文件系统。模块每次开机注册，内核按 SDIO ID 匹配；普通 TF 卡仍复用 S05mdev 和原有挂载脚本。相机驱动及 ISP 文件在本轮没有变化。没有修改 MMC 公共驱动或分区表。
+
+## WiFi 路由器连接补充
+
+相对已验证的驱动版 b01d6da，只改变两个 SDK 文件、59 行增量补丁：
+
+- `openwrt/target/v861/v861-avaota_f2/defconfig`：开启 `CONFIG_BUSYBOX_CONFIG_UDHCPC` 和 `CONFIG_PACKAGE_wpa-cli`。
+- `openwrt/openwrt/package/network/services/hostapd/Makefile`：在配置变化依赖、nl80211 后端选择、libnl-tiny 包依赖和链接条件中识别现有 `kmod-tf-rtl8189fs`。不选择 backports cfg80211，不改认证算法。
+
+不额外修改内核、设备树、驱动、摄像头配置、分区表或开机脚本，不预置任何网络凭据。README 给出手动 WPA2 连接、DHCP 和检查步骤。

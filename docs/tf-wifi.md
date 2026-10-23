@@ -6,7 +6,7 @@
 
 ## 修改范围
 
-相对 `v0.1.0` 共 11 个 SDK 文件：
+相对 `v0.1.0` 共 12 个 SDK 文件：
 
 | 文件 | 用途 |
 |---|---|
@@ -19,7 +19,8 @@
 | `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts` | SDC0 开 SDIO、DAT1 中断、3.3V、25MHz；关闭 auto_print |
 | 同目录 `bsp_defconfig` | BSP cfg80211、RTL8189FS 模块 |
 | `openwrt/target/v861/v861-avaota_f2/modules.mk` | 将匹配内核的两个模块装入 rootfs |
-| 同目录 `defconfig` | 选择 `kmod-tf-rtl8189fs` |
+| 同目录 `defconfig` | 选择 `kmod-tf-rtl8189fs`、wpa_cli、BusyBox udhcpc |
+| `openwrt/openwrt/package/network/services/hostapd/Makefile` | 原生模块对应的 nl80211、libnl 构建条件 |
 | 同目录 `busybox-init-base-files/etc/init.d/S06tfwifi` | 开机自动注册 cfg80211、RTL8189FS 驱动 |
 
 驱动表格中省略的目录前缀均为 `bsp/drivers/net/wireless/rtl8189fs/`。P2P、MP 测试、外置 EFUSE/PHY 参数文件和调试日志的配置沿用参考包的精简选项。AP 能力未额外裁剪。
@@ -82,7 +83,7 @@ ifconfig wlan0
 
 参考实物的 SDIO ID 是 `024c:f179`；接口预期为 `wlan0`。接口未启用时，直接 `ifconfig` 可能不显示 wlan0，可使用 `ifconfig -a` 或 `ls /sys/class/net` 查看；`ifconfig wlan0 up` 用于启用接口。出现 SDIO 设备却无 wlan0 时，检查 `dmesg`、`/lib/modules/$(uname -r)/cfg80211.ko`、`8189fs.ko` 及 S06tfwifi。其他芯片即使使用同样 TF 插槽，也不能直接套用此驱动。
 
-本次最小适配以驱动绑定和无线接口可用为验收；没有预置 SSID/密码或自动联网服务。需要关联路由器时，应另行配置支持 nl80211 的 wpa_supplicant 和 DHCP 客户端。不要把 wlan0 出现等同于已获得 IP 或通过无线传输测试。
+当前联网版已补齐 nl80211 认证、wpa_cli 和 DHCP 客户端，手动连接步骤见仓库 README，实际认证/IP/通信结果见 `wifi-network-validation.md`。没有预置 SSID/密码或自动联网服务；仅看到 wlan0 不能证明已联网。
 
 ## 验证记录
 

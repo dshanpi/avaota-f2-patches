@@ -1,5 +1,7 @@
 # TF WiFi 干净 SDK 验证（2026-10-22～23）
 
+本页保留驱动与换卡阶段的历史固件记录。后续认证/DHCP/网络通信及新版固件见 [WiFi 联网验证](wifi-network-validation.md)。
+
 本轮源代码来自远端 `codex/tf-sdio-wifi` 分支提交 `9fc7f6c06049c1cf81020d9f60e505f09fa718ed`，在 `/home/ubuntu/avaota-f2-tfwifi-clean-20261022/tina-v861-v1.1` 完成。
 
 ## 已完成
