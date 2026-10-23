@@ -80,7 +80,7 @@ ifconfig wlan0 up
 ifconfig wlan0
 ```
 
-参考实物的 SDIO ID 是 `024c:f179`；接口预期为 `wlan0`。出现 SDIO 设备却无 wlan0 时，检查 `dmesg`、`/lib/modules/$(uname -r)/cfg80211.ko`、`8189fs.ko` 及 S06tfwifi。其他芯片即使使用同样 TF 插槽，也不能直接套用此驱动。
+参考实物的 SDIO ID 是 `024c:f179`；接口预期为 `wlan0`。接口未启用时，直接 `ifconfig` 可能不显示 wlan0，可使用 `ifconfig -a` 或 `ls /sys/class/net` 查看；`ifconfig wlan0 up` 用于启用接口。出现 SDIO 设备却无 wlan0 时，检查 `dmesg`、`/lib/modules/$(uname -r)/cfg80211.ko`、`8189fs.ko` 及 S06tfwifi。其他芯片即使使用同样 TF 插槽，也不能直接套用此驱动。
 
 本次最小适配以驱动绑定和无线接口可用为验收；没有预置 SSID/密码或自动联网服务。需要关联路由器时，应另行配置支持 nl80211 的 wpa_supplicant 和 DHCP 客户端。不要把 wlan0 出现等同于已获得 IP 或通过无线传输测试。
 
