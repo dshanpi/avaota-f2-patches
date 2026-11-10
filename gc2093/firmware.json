@@ -1,8 +1,0 @@
-{
-  "filename": "v861_avaota_f2_gc2093_1080p30_test_20261110.img",
-  "sha256": "e354ae160b5b5f862e8442a0a8bd7df75a9eb390c978218bdcd3aa7bb68848a4",
-  "bytes": 14897152,
-  "kernel_build": "Linux 6.6.0 #2 SMP Tue Nov 10 03:27:07 EST 2026",
-  "build_scope": "incremental kernel + pack; reused existing rootfs",
-  "board": "v861-avaota_f2-tina"
-}

@@ -1,86 +1,20 @@
-[
-  {
-    "path": "bsp/drivers/net/wireless/rtl8189fs/Makefile",
-    "sha256": "5fca33fd9686d6b7042a9ce2225cc9667ec55b0343de2b7143d8fce5c3a16d96"
-  },
-  {
-    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/ioctl_cfg80211.c",
-    "sha256": "088e11665b80d39698acd0becdeba54d5ec37352838b00cf1dddca933cc5c9cd"
-  },
-  {
-    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/os_intfs.c",
-    "sha256": "6a95a1c6d6e94b5824c879fa9e941ad4a8d4434c0a783e41a491fcf0b10002e3"
-  },
-  {
-    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/rtw_proc.c",
-    "sha256": "5d7383f41cb3f92391fc367eed19b5aad8165077074450f93e9ae2e4a1d0a2d9"
-  },
-  {
-    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/linux/wifi_regd.c",
-    "sha256": "9b5b04ce1060876a16a89eaaad3abcc9067aeff731fbec63fc86a9a28a6358a0"
-  },
-  {
-    "path": "bsp/drivers/net/wireless/rtl8189fs/os_dep/osdep_service.c",
-    "sha256": "32066d56f15a1283c1e803d0a6d4423b0855f5efbf2b033ebf385c014af36fa9"
-  },
-  {
-    "path": "bsp/drivers/vin/modules/sensor/ov13850_mipi.c",
-    "sha256": "4abaf52cf80c78fd36873f4d3c83be09d9dc264e9c691a4052aebbe6a8677632"
-  },
-  {
-    "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts",
-    "sha256": "e6c8a9a15a54faec5a42607bac80bd493ee3612a94de2cb41ad5d6bc4bf1b559"
-  },
-  {
-    "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig",
-    "sha256": "6a7081d352ef0d3031e8d54bed15a982c6b20aa2883a95f6c137794188bd8aab"
-  },
-  {
-    "path": "openwrt/openwrt/package/network/services/hostapd/Makefile",
-    "sha256": "df8500a7dc61e1d62956a08541d610d9e18bf4259769df6e48679b544cb1bfe0"
-  },
-  {
-    "path": "openwrt/package/allwinner/system/busybox-init-base-files/files/usr/bin/hotplug.sh",
-    "sha256": "513e1ffa17f2d2134ab1eced5d22d13ce9ecb77a3d3d725eed5b7d082a1d7a83"
-  },
-  {
-    "path": "openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/Config.in",
-    "sha256": "308cfbb6ab2ed5b0b539b58808816ba570c30741638868d3928be9b11d231498"
-  },
-  {
-    "path": "openwrt/package/allwinner/vision/libAWIspApi/machinfo/v861/libisp_config.mk",
-    "sha256": "82a48b37d76df4c9b11b68c7fce6c7c640b63e959c792e056bad0fc26c2d556c"
-  },
-  {
-    "path": "openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp",
-    "sha256": "5a99b1e70667357ee4b5aae959fd046f883d734b84791732df9918b655b9bc5b"
-  },
-  {
-    "path": "openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S05mdev",
-    "sha256": "1fed2137f1fb26d9214e249fabdaba72659dc2ca03ec3fba3f2bccd3e7d4fd95"
-  },
-  {
-    "path": "openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S06tfwifi",
-    "sha256": "7f7bf86865d0af4d53fdcce57dff0734986b726fb915dc69bd37cc16aef58b51"
-  },
-  {
-    "path": "openwrt/target/v861/v861-avaota_f2/defconfig",
-    "sha256": "120e4630a5ca6c4575e45fe802c844392898a96eda6435437f948c97f5c5ac01"
-  },
-  {
-    "path": "openwrt/target/v861/v861-avaota_f2/modules.mk",
-    "sha256": "68c31d01b16542011e0fd3fc14f15b31af0cebb38f94aff9ee1671db1d8718ac"
-  },
-  {
-    "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/ov13850/ov13850_mipi_isp610_20261021_195907.h",
-    "sha256": "752f97c6725d2f27b0fc5cdd871cc6219d224564012cd52f966b7e1d1d43adb5"
-  },
-  {
-    "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c",
-    "sha256": "cea76c4352779351232c55c132182efd6e3bb2cf2f722cf8d374bab96cf94b09"
-  },
-  {
-    "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/tina.mk",
-    "sha256": "de01fc4c9b8142d648f1ba6c8f2c4e82cdc2c5d7252e9a60c9e5047af9d06057"
-  }
-]
+{
+  "baseline": "User SDK v861-avaota_f2-tina with GC2093 driver/module already enabled; inherited OV13850 ISP integration",
+  "source_paths": [
+    {
+      "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts",
+      "before_sha256": "16ae6f77094f922256507fe2230e345236f6c802339d220013b7f48121afd796",
+      "after_sha256": "ae88b9e813709db6202e037e6627dd5e62aefd4e139f6a9507c3aa094650bc76"
+    },
+    {
+      "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/isp_ini_parse.c",
+      "before_sha256": "19d3ef9f38951fa57a2db0c839824d0535c945ebde439a02d835bc53015fe685",
+      "after_sha256": "a83eaca0162c76ca38683eef0b542daa4ee65878ec40dad8c664638231ee8edb"
+    },
+    {
+      "path": "platform/allwinner/vision/libAWIspApi/isp_mpp/isp_v861/libisp/isp_cfg/SENSOR_H/gc2093/gc2093_mipi_k230_reference_isp610.h",
+      "before_sha256": null,
+      "after_sha256": "3079b7441928b24556f48e537aa505a0a986b98a5f93268c266d7fd025bc43ad"
+    }
+  ]
+}
