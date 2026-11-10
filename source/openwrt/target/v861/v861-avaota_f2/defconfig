@@ -2663,8 +2663,7 @@ CONFIG_libisp_select_sensor=y
 # CONFIG_gc1084 is not set
 # CONFIG_imx258 is not set
 # CONFIG_gc2053 is not set
-CONFIG_ov13850=y
-# CONFIG_gc2083 is not set
+CONFIG_gc2083=y
 # CONFIG_gc4663 is not set
 # CONFIG_gc8613 is not set
 # CONFIG_f37p is not set
@@ -3670,7 +3669,6 @@ CONFIG_PACKAGE_kmod-sensor-gc2093=y
 # CONFIG_PACKAGE_kmod-sensor-imx681 is not set
 # CONFIG_PACKAGE_kmod-sensor-imx766 is not set
 # CONFIG_PACKAGE_kmod-sensor-os02g10 is not set
-# CONFIG_PACKAGE_kmod-sensor-ov13850 is not set
 # CONFIG_PACKAGE_kmod-sensor-sc231hai is not set
 # CONFIG_PACKAGE_kmod-sensor-sc2337p is not set
 # CONFIG_PACKAGE_kmod-sensor-sc235hai is not set

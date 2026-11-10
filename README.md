@@ -22,7 +22,7 @@ SHA256SUMS                  交付文件校验值
 
 SDK原有 `gc2093_mipi.c` 没有修改，因此不重复收录。此前只收录设备树会遗漏外发时必要的选中配置，现在补齐这两个配置文件。它们是本次已验证SDK的完整配置，保留用户原SDK既有设置；GC2093选择项原已启用，不能把完整文件中所有选项都计作此次新增修改。
 
-注意，OpenWrt配置里的 `CONFIG_ov13850=y` 是原SDK已有的ISP效果库编译选项，**不是**内核驱动选择；传感器驱动包实际由 `CONFIG_PACKAGE_kmod-sensor-gc2093=y` 选择。本分支只交付驱动适配，未为了删除历史ISP选项而扩大修改范围。
+OpenWrt的ISP效果选择保持原SDK默认值，本分支只选择GC2093内核驱动包，RAW测试不启动ISP。
 
 相同SDK/板级配置基线下，可按SDK原路径覆盖 `source/` 中的三个文件。已有其他板级定制时，应合并设备树和上述两个GC2093选择项，避免整文件覆盖自己的设置。
 
@@ -45,14 +45,24 @@ SDK已有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c`，已能驱动这颗模
 
 本模组的**7位I²C地址是0x7e**。VIN将设备树的该字段右移一位，因此必须填0xfc；填0x7e时会错误访问0x3f。用户态i2ctransfer仍使用0x7e，不使用0xfc。
 
-## 应用（Ubuntu SDK主机）
+## 干净SDK复现（Ubuntu SDK主机）
 
-先选择 `v861-avaota_f2-tina` 配置，将仓库 `source/` 的文件按原相对路径复制到匹配的SDK，或合并对应设置。随后在SDK根目录完整编译并打包，使内核模块选择和OpenWrt模块打包配置都生效：
+先从原始 `tina-v861-v1.1.tar.xz` 解压新SDK，并取得本分支。以下假设仓库在 `$PATCH_DIR`、SDK在 `$SDK_DIR`，两者均设置为实际绝对路径：
 
 ```sh
+SDK_DIR=/home/ubuntu/tina-v861-v1.1
+PATCH_DIR=/home/ubuntu/Downloads/avaota-f2-patches
+cd "$SDK_DIR"
+./build.sh autoconfig -i v861 -o openwrt -b avaota_f2 -n nor -k linux-6.6-xuantie -a riscv32
+cp -a "$PATCH_DIR/source/." "$SDK_DIR/"
+./build.sh loadconfig
+cp openwrt/target/v861/v861-avaota_f2/defconfig openwrt/openwrt/.config
+./build.sh openwrt_rootfs defconfig
 ./build.sh
 ./build.sh pack
 ```
+
+完整编译使内核驱动选择和OpenWrt模块打包配置共同生效。SDK首次配置时如出现原厂许可提示，请按原SDK流程处理。固件输出为 `out/v861_linux_avaota_f2_uart0_nor.img`。这套流程正在本次新解压SDK上完整验证；在验证完成前不将其列为已通过。
 
 如果当前SDK已经选中并打包了GC2093，只需要地址修正，也可以使用一行补丁：
 
