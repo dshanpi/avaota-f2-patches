@@ -1,3 +1,5 @@
+> 本分支新增 GC2093 驱动验证资料，请先阅读 [gc2093/README.md](gc2093/README.md) 和 [验证结果](gc2093/VALIDATION.md)。以下历史说明仍对应 OV13850。
+
 # Avaota F2 适配补丁
 
 基于 **Tina V861 v1.1 / Avaota F2 NOR / Linux 6.6 Xuantie**，提供 OV13850 四 Lane RAW10 BGGR 驱动、原厂 ISP610 参数接入，以及 TF 卡自动识别/挂载、RTL8189FS TF 接口 WiFi 自动驱动加载。
