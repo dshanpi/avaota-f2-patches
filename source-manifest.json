@@ -1,14 +1,22 @@
 [
   {
     "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts",
-    "sha256": "ae88b9e813709db6202e037e6627dd5e62aefd4e139f6a9507c3aa094650bc76"
+    "sha256": "a9e44f001fca18acbe8459afcc324afaaf7bfe880d40b3768505007c2e6f7ad9"
   },
   {
     "path": "device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig",
-    "sha256": "983ed192f3eba7776d8cff21e162ce843e728c7c8dc9681ca94997a14cf3cbfd"
+    "sha256": "783fc29c015b758d03e4545fc0b859c29f1a9a52a18ba3ca94e200b75983c7af"
   },
   {
     "path": "openwrt/target/v861/v861-avaota_f2/defconfig",
-    "sha256": "0b9671dd5259bb3ae5fd0176703db330d21d96a593564246c37abc8af7cfdb96"
+    "sha256": "a11183a3c9e02b37c23139ff09baa13e96180b81ab3bea511ee8f4faa5795a01"
+  },
+  {
+    "path": "openwrt/target/v861/v861-avaota_f2/modules.mk",
+    "sha256": "34ddb2b6a4e94a16493bcba36145eead310dc13dc40f4211dbe65640f622ad17"
+  },
+  {
+    "path": "openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp",
+    "sha256": "d50e15cbce68fad43dfe87cfcd4a335001417db26098ba80cd0d850ec83065e7"
   }
 ]

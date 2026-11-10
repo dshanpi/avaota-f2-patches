@@ -1,11 +1,97 @@
 --- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
 +++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts
-@@ -998,7 +998,7 @@
+@@ -996,10 +996,10 @@
+ 
+ 	sensor0: sensor@5812000 {
  		device_type = "sensor0";
- 		sensor0_mname = "gc2093_mipi";
+-		sensor0_mname = "gc2083_mipi";
++		sensor0_mname = "gc2093_mipi";
  		sensor0_twi_cci_id = <1>;
--		sensor0_twi_addr = <0x7e>;
+-		sensor0_twi_addr = <0x6e>;
+-		sensor0_mclk_id = <0>;
 +		sensor0_twi_addr = <0xfc>;
- 		sensor0_mclk_id = <1>;
++		sensor0_mclk_id = <1>;
  		sensor0_pos = "rear";
  		sensor0_isp_used = <1>;
+ 		sensor0_fmt = <1>;
+@@ -1008,8 +1008,8 @@
+ 		sensor0_hflip = <0>;
+ 		sensor0_iovdd-supply = <>;
+ 		sensor0_iovdd_vol = <>;
+-		sensor0_avdd-supply = <&reg_axp333_aldo1>;
+-		sensor0_avdd_vol = <2800000>;
++		sensor0_avdd-supply = <>;
++		sensor0_avdd_vol = <>;
+ 		sensor0_dvdd-supply = <>;
+ 		sensor0_dvdd_vol = <>;
+ 		sensor0_power_en = <>;
+@@ -1123,8 +1123,8 @@
+ 	};
+ 
+ 	vinc00:vinc@5830000 {
+-		vinc0_csi_sel = <1>;
+-		vinc0_mipi_sel = <1>;
++		vinc0_csi_sel = <0>;
++		vinc0_mipi_sel = <0>;
+ 		vinc0_isp_sel = <0>;
+ 		vinc0_isp_tx_ch = <0>;
+ 		vinc0_tdm_rx_sel = <0>;
+--- a/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
++++ b/device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig
+@@ -37,8 +37,7 @@
+ CONFIG_D3D_LBC_MODE=y
+ CONFIG_D3D_COMPRESS_EN=y
+ # CONFIG_SAME_I2C is not set
+-CONFIG_SENSOR_GC2083_MIPI=m
+-CONFIG_SENSOR_GC2083_ONE_LANE_MIPI=y
++CONFIG_SENSOR_GC2093_MIPI=m
+ CONFIG_SND_SOC_SUNXI_DEBUG=y
+ CONFIG_SND_SOC_SUNXI_AAUDIO=y
+ CONFIG_SND_SOC_SUNXI_I2S=y
+--- a/openwrt/target/v861/v861-avaota_f2/defconfig
++++ b/openwrt/target/v861/v861-avaota_f2/defconfig
+@@ -3654,8 +3654,9 @@
+ # CONFIG_PACKAGE_kmod-sensor-cv8002 is not set
+ # CONFIG_PACKAGE_kmod-sensor-gc13a2 is not set
+ # CONFIG_PACKAGE_kmod-sensor-gc2053 is not set
+-CONFIG_PACKAGE_kmod-sensor-gc2083=y
++# CONFIG_PACKAGE_kmod-sensor-gc2083 is not set
+ # CONFIG_PACKAGE_kmod-sensor-gc2083_vc is not set
++CONFIG_PACKAGE_kmod-sensor-gc2093=y
+ # CONFIG_PACKAGE_kmod-sensor-gc20c3 is not set
+ # CONFIG_PACKAGE_kmod-sensor-gc4053 is not set
+ # CONFIG_PACKAGE_kmod-sensor-gc4602 is not set
+--- a/openwrt/target/v861/v861-avaota_f2/modules.mk
++++ b/openwrt/target/v861/v861-avaota_f2/modules.mk
+@@ -3,3 +3,13 @@
+ #
+ # This is free software, licensed under the GNU General Public License v2.
+ # See /build/LICENSE for more information.
++
++define KernelPackage/sensor-gc2093
++	SUBMENU:=$(VIDEO_MENU)
++	TITLE:=Sensor GC2093 support
++	DEPENDS:= +kmod-vin-v4l2
++	FILES+=$(CONFIG_EXTERNAL_KERNEL_TREE)/bsp/drivers/vin/modules/sensor/gc2093_mipi.ko
++	AUTOLOAD:=$(call AutoProbe,gc2093_mipi)
++endef
++
++$(eval $(call KernelPackage,sensor-gc2093))
+--- a/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp
++++ b/openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp
+@@ -18,6 +18,7 @@
+     [ -f $MODULES_DIR/dw9800_act.ko ] && insmod $MODULES_DIR/dw9800_act.ko
+     [ -f $MODULES_DIR/gc4663_mipi.ko ] && insmod $MODULES_DIR/gc4663_mipi.ko
+     [ -f $MODULES_DIR/gc2083_mipi.ko ] && insmod $MODULES_DIR/gc2083_mipi.ko
++    [ -f $MODULES_DIR/gc2093_mipi.ko ] && insmod $MODULES_DIR/gc2093_mipi.ko
+     [ -f $MODULES_DIR/gc2083_mipi_vc.ko ] && insmod $MODULES_DIR/gc2083_mipi_vc.ko
+     [ -f $MODULES_DIR/sc235hai_mipi.ko ] && insmod $MODULES_DIR/sc235hai_mipi.ko
+     [ -f $MODULES_DIR/gc8613_mipi.ko ] && insmod $MODULES_DIR/gc8613_mipi.ko
+@@ -41,6 +42,7 @@
+     rmmod $MODULES_DIR/vin_v4l2.ko
+     [ -f $MODULES_DIR/gc4663_mipi.ko ] && rmmod $MODULES_DIR/gc4663_mipi.ko
+     [ -f $MODULES_DIR/gc2083_mipi.ko ] && rmmod $MODULES_DIR/gc2083_mipi.ko
++    [ -f $MODULES_DIR/gc2093_mipi.ko ] && rmmod $MODULES_DIR/gc2093_mipi.ko
+     [ -f $MODULES_DIR/gc2083_mipi_vc.ko ] && rmmod $MODULES_DIR/gc2083_mipi_vc.ko
+     [ -f $MODULES_DIR/sc235hai_mipi.ko ] && rmmod $MODULES_DIR/sc235hai_mipi.ko
+     [ -f $MODULES_DIR/sc2337p_mipi.ko ] && rmmod $MODULES_DIR/sc2337p_mipi.ko

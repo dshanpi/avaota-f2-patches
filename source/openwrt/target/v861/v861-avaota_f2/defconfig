@@ -4,7 +4,6 @@
 #
 CONFIG_MODULES=y
 CONFIG_HAVE_DOT_CONFIG=y
-# CONFIG_TARGET_v861_DshanPi_mCoreB_V881_5D8E is not set
 # CONFIG_TARGET_v861_aiglass is not set
 # CONFIG_TARGET_v861_aiglass_sc1770v is not set
 # CONFIG_TARGET_v861_aov is not set
@@ -2829,7 +2828,7 @@ CONFIG_mpp_sample=y
 CONFIG_mpp_sample_smartIPC_demo=y
 # CONFIG_mpp_sample_smartIPC_demo_copy_to_rootfs is not set
 # CONFIG_mpp_sample_select is not set
-CONFIG_mpp_sample_takePicture=y
+# CONFIG_mpp_sample_takePicture is not set
 # CONFIG_mpp_sample_identifyQRCode is not set
 # CONFIG_mpp_sample_timelapse is not set
 # CONFIG_mpp_sample_uvcin is not set
@@ -4857,7 +4856,7 @@ CONFIG_PACKAGE_libffi=y
 # CONFIG_PACKAGE_libhiredis is not set
 # CONFIG_PACKAGE_libhttp-parser is not set
 # CONFIG_PACKAGE_libhwloc is not set
-CONFIG_PACKAGE_libi2c=y
+# CONFIG_PACKAGE_libi2c is not set
 # CONFIG_PACKAGE_libical is not set
 # CONFIG_PACKAGE_libiconv is not set
 # CONFIG_PACKAGE_libiconv-full is not set
@@ -6554,7 +6553,7 @@ CONFIG_PACKAGE_uboot-envtools=y
 # CONFIG_PACKAGE_hwclock is not set
 # CONFIG_PACKAGE_hwinfo is not set
 # CONFIG_PACKAGE_hwloc-utils is not set
-CONFIG_PACKAGE_i2c-tools=y
+# CONFIG_PACKAGE_i2c-tools is not set
 # CONFIG_PACKAGE_iconv is not set
 # CONFIG_PACKAGE_iio-utils is not set
 # CONFIG_PACKAGE_inotifywait is not set

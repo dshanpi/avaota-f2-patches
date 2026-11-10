@@ -12,38 +12,29 @@ source-manifest.json         source文件SHA-256清单
 SHA256SUMS                  交付文件校验值
 ```
 
-`source/` 与主分支采用相同布局，保存驱动适配所需的完整板级文件和选中配置：
+`source/` 与主分支采用相同布局，保存驱动适配所需的五个完整板级文件、选中配置及模块集成：
 
 | SDK相对路径 | 用途 |
 |---|---|
 | `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts` | GC2093地址、总线、路由及复位配置 |
 | `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig` | `CONFIG_SENSOR_GC2093_MIPI=m`，编译GC2093内核模块 |
 | `openwrt/target/v861/v861-avaota_f2/defconfig` | `CONFIG_PACKAGE_kmod-sensor-gc2093=y`，把模块打包进固件并参与自动加载 |
+| `openwrt/target/v861/v861-avaota_f2/modules.mk` | 定义GC2093 OpenWrt内核模块包 |
+| `openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp` | 在VIN之前加载GC2093，停止时卸载 |
 
-SDK原有 `gc2093_mipi.c` 没有修改，因此不重复收录。此前只收录设备树会遗漏外发时必要的选中配置，现在补齐这两个配置文件。它们是本次已验证SDK的完整配置，保留用户原SDK既有设置；GC2093选择项原已启用，不能把完整文件中所有选项都计作此次新增修改。
+SDK原有 `gc2093_mipi.c` 没有修改，因此不重复收录。干净SDK验证发现，仅提供设备树和两个defconfig会遗漏OpenWrt包定义与BusyBox启动加载；现已补齐。五个文件均从原始SDK基线生成，只保留GC2093所需差异，TDM模式和CPU频率保持原SDK默认值。
+
+可以按SDK原路径覆盖 `source/` 五个文件，或在原始SDK根目录应用 `patches/gc2093-driver-minimal.patch`，二选一。已有自定义配置时应先审查差异，避免覆盖自己的设置。
 
 OpenWrt的ISP效果选择保持原SDK默认值，本分支只选择GC2093内核驱动包，RAW测试不启动ISP。
-
-相同SDK/板级配置基线下，可按SDK原路径覆盖 `source/` 中的三个文件。已有其他板级定制时，应合并设备树和上述两个GC2093选择项，避免整文件覆盖自己的设置。
-
-`patches/gc2093-driver-minimal.patch` 保留为**已选中GC2093的用户SDK上仅修正地址的一行增量**，它不重复包含原已启用的驱动配置。尚未选中驱动时，不能只套用这个地址补丁而漏掉两个配置项。
 
 测试方法见 [test/README.md](test/README.md)。测试应用源码和脚本不属于需要覆盖到SDK中的驱动修改；预编译应用在SDK主机执行 `test/build-test.sh` 后生成。
 
 ## 本次实际修改
 
-SDK已有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c`，已能驱动这颗模组，本次无需修改或复制该文件。
+SDK已有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c`，无需修改寄存器驱动。板级适配包括：I²C1、MIPI0/CSI0、MCLK1、模组供电及复位选择，驱动编译和固件打包，以及BusyBox启动加载。
 
-当前用户SDK已配置GC2093、I²C1、MIPI0/CSI0和模块自动加载。本次修正一个设备树字段：
-
-文件：`device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts`
-
-```diff
-- sensor0_twi_addr = <0x7e>;
-+ sensor0_twi_addr = <0xfc>;
-```
-
-本模组的**7位I²C地址是0x7e**。VIN将设备树的该字段右移一位，因此必须填0xfc；填0x7e时会错误访问0x3f。用户态i2ctransfer仍使用0x7e，不使用0xfc。
+本模组的**7位I²C地址是0x7e**。VIN将设备树的该字段右移一位，因此 `sensor0_twi_addr` 填0xfc；用户态i2ctransfer仍使用0x7e。
 
 ## 干净SDK复现（Ubuntu SDK主机）
 
@@ -64,16 +55,7 @@ cp openwrt/target/v861/v861-avaota_f2/defconfig openwrt/openwrt/.config
 
 完整编译使内核驱动选择和OpenWrt模块打包配置共同生效。SDK首次配置时如出现原厂许可提示，请按原SDK流程处理。固件输出为 `out/v861_linux_avaota_f2_uart0_nor.img`。这套流程正在本次新解压SDK上完整验证；在验证完成前不将其列为已通过。
 
-如果当前SDK已经选中并打包了GC2093，只需要地址修正，也可以使用一行补丁：
-
-```sh
-patch --dry-run -p1 < /path/to/gc2093-driver-minimal.patch
-patch -p1 < /path/to/gc2093-driver-minimal.patch
-./build.sh kernel
-./build.sh pack
-```
-
-该地址补丁基线为本次用户正在使用、已选好GC2093的SDK，差异仅1处、1行。若设备树已经是0xfc，不必重复应用。
+若采用补丁方式，请先在原始SDK根目录执行 `patch --dry-run -p1 < /path/to/gc2093-driver-minimal.patch`，确认后应用，再执行相同的完整构建流程。已经覆盖过 `source/` 的SDK不需要再套同一补丁。
 
 ## 测试（开发板串口）
 
@@ -89,9 +71,9 @@ sh run-camera-test.sh
 
 测试结果在 `/mnt/extsd/gc2093-raw-test/`。若挂载路径不同，修改命令中的路径及测试配置的 `OUTPUT_DIR`。板端命令统一直接在串口执行，SDK编译命令在Ubuntu主机执行。
 
-## 原SDK已具备的配置
+## 适配配置核对
 
-以下是驱动适配所需配置；原已启用的选择项也一并保存在 `source/` 供外发使用：
+以下是驱动适配所需配置；选择项与模块集成一并保存在 `source/` 供外发使用：
 
 ```dts
 sensor0_mname = "gc2093_mipi";

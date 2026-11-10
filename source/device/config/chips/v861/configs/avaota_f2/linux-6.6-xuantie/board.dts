@@ -139,10 +139,10 @@
 
 &cluster0_opp_table {
 	opp@1368000000 {
-		status = "disabled";
+		status = "okay";
 	};
 	opp@1416000000 {
-		status = "disabled";
+		status = "okay";
 	};
 };
 
@@ -854,12 +854,12 @@
 	};
 
 	tdm0: tdm@5908000 {
-		work_mode = <0x1>;
+		work_mode = <0x0>;
 		delay_init = <0>;
 	};
 
 	isp00:isp@5900000 {
-		work_mode = <0x1>;
+		work_mode = <0x0>;
 		delay_init = <0>;
 	};
 
@@ -891,7 +891,7 @@
 	};
 
 	scaler00:scaler@5910000 {
-		work_mode = <0x1>;
+		work_mode = <0x0>;
 		status = "okay";
 		delay_init = <0>;
 	};
@@ -1133,7 +1133,7 @@
 		vinc0_front_sensor_sel = <0>;
 		vinc0_sensor_list = <0>;
 		delay_init = <0>;
-		work_mode = <0x1>;
+		work_mode = <0x0>;
 		status = "okay";
 	};
 
