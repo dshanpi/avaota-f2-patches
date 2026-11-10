@@ -13,12 +13,14 @@
 static int xi(int f, unsigned long op, void *p) { int r; do {r=ioctl(f,op,p);}while(r<0 && errno==EINTR); return r; }
 #define CALL(op,p) do { if(xi(fd,op,p)<0){perror(#op);goto done;} }while(0)
 int main(int argc,char **argv) {
- int fd=-1,rc=1,stream=0,input=0,want=argc>1?atoi(argv[1]):300,n=0,errors=0,gaps=0;
+ int fd=-1,rc=1,stream=0,input=0,want=argc>1?atoi(argv[1]):300,n=0,errors=0,gaps=0,saved_index=-1;
+ unsigned saved_bytes=0;
  void *mem[4]={0}; size_t len[4]={0}; unsigned prev=0; double first=0,last=0;
  enum v4l2_buf_type type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
  struct v4l2_requestbuffers req={.count=3,.type=type,.memory=V4L2_MEMORY_MMAP};
  struct v4l2_streamparm sp={.type=type}; struct v4l2_format fmt={.type=type};
  setvbuf(stdout,NULL,_IOLBF,0);
+ if(want<2){fprintf(stderr,"Frame count must be at least 2\n");return 1;}
  fd=open("/dev/video0",O_RDWR|O_NONBLOCK); if(fd<0){perror("open");return 1;}
  CALL(VIDIOC_S_INPUT,&input);
  sp.parm.capture.capturemode=2; sp.parm.capture.timeperframe.numerator=1;sp.parm.capture.timeperframe.denominator=30;
@@ -36,9 +38,10 @@ int main(int argc,char **argv) {
  if(b.index>=req.count||p[0].bytesused>len[b.index])goto done;
  double t=b.timestamp.tv_sec+b.timestamp.tv_usec*1e-6;if(n==0)first=t;else if(b.sequence>prev+1)gaps+=b.sequence-prev-1;last=t;prev=b.sequence;
  if(b.flags&V4L2_BUF_FLAG_ERROR)errors++;
- if(n==10 && argc>2){FILE *o=fopen(argv[2],"wb");if(!o){perror("save");goto done;}size_t z=fwrite(mem[b.index],1,p[0].bytesused,o);fclose(o);if(z!=p[0].bytesused)goto done;printf("SAVED %s bytes=%u\n",argv[2],p[0].bytesused);}
  if(n%30==0)printf("FRAME %d sequence=%u timestamp=%.6f bytes=%u flags=0x%x\n",n,b.sequence,t,p[0].bytesused,b.flags);
- CALL(VIDIOC_QBUF,&b);}
+ if(n==want-1 && argc>2){saved_index=b.index;saved_bytes=p[0].bytesused;}else{CALL(VIDIOC_QBUF,&b);}}
+ CALL(VIDIOC_STREAMOFF,&type);stream=0;
+ if(saved_index>=0){FILE *o=fopen(argv[2],"wb");if(!o){perror("save");goto done;}size_t z=fwrite(mem[saved_index],1,saved_bytes,o);int e=fclose(o);if(z!=saved_bytes||e){perror("save");goto done;}printf("SAVED %s bytes=%u\n",argv[2],saved_bytes);}
  printf("RESULT frames=%d elapsed=%.6f fps=%.4f error_flags=%d sequence_gaps=%d\n",n,last-first,last>first?(n-1)/(last-first):0,errors,gaps);rc=errors||gaps?2:0;
  done:if(stream && xi(fd,VIDIOC_STREAMOFF,&type)<0){perror("STREAMOFF");rc=1;}for(int i=0;i<4;i++)if(mem[i])munmap(mem[i],len[i]);if(fd>=0)close(fd);return rc;
 }

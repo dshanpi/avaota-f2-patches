@@ -1,48 +1,42 @@
 # V861 Avaota F2 GC2093 驱动最小修改
 
-本分支仅存放GC2093驱动适配所需的最小增量。ISP效果参数、照片和采集应用属于其他调试资料，不纳入本分支。
+`gc2093-support` 分支适配本次使用的 GC2093 模组：内置 24MHz 晶振、7 位 I²C 地址 0x7e、双 Lane 1920×1080 RAW10 / 30fps。连接开发板四 Lane 接口中的 MIPI0/CSI0。
 
-## 目录结构
+已从原始 Tina V861 v1.1 压缩包重新解压 SDK，仅覆盖本分支 `source/`，完整编译、LYNX 烧录校验，并通过串口完成识别及一分钟 RAW 收帧验证。详情见 [干净 SDK 验证记录](docs/clean-sdk-validation.md)。
+
+## 文件与修改范围
 
 ```text
-source/                     补丁对应的完整修改后源码，保持SDK原路径
-patches/                    GC2093驱动最小差异补丁
-test/                       RAW采集应用源码、构建脚本、运行脚本和配置
-source-manifest.json         source文件SHA-256清单
-SHA256SUMS                  交付文件校验值
+source/                     按 SDK 原路径保存的五个完整修改文件
+patches/gc2093-driver-minimal.patch  相对原始 SDK 的完整差异
+test/                       RAW 测试源码、编译/运行脚本及串口传输辅助程序
+docs/                       本分支干净 SDK 验证记录
+source-manifest.json         五个 source 文件的 SHA-256
+SHA256SUMS                  仓库交付文件校验清单
 ```
 
-`source/` 与主分支采用相同布局，保存驱动适配所需的五个完整板级文件、选中配置及模块集成：
-
-| SDK相对路径 | 用途 |
+| SDK 相对路径 | 必要修改 |
 |---|---|
-| `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts` | GC2093地址、总线、路由及复位配置 |
-| `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig` | `CONFIG_SENSOR_GC2093_MIPI=m`，编译GC2093内核模块 |
-| `openwrt/target/v861/v861-avaota_f2/defconfig` | `CONFIG_PACKAGE_kmod-sensor-gc2093=y`，把模块打包进固件并参与自动加载 |
-| `openwrt/target/v861/v861-avaota_f2/modules.mk` | 定义GC2093 OpenWrt内核模块包 |
-| `openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp` | 在VIN之前加载GC2093，停止时卸载 |
+| `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts` | GC2093 名称、地址 0xfc、MCLK1、模组供电及 MIPI0/CSI0 路由 |
+| `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig` | 用 `CONFIG_SENSOR_GC2093_MIPI=m` 替代原 GC2083 驱动选择 |
+| `openwrt/target/v861/v861-avaota_f2/defconfig` | 用 `CONFIG_PACKAGE_kmod-sensor-gc2093=y` 替代原 GC2083 模块包 |
+| `openwrt/target/v861/v861-avaota_f2/modules.mk` | 增加 GC2093 模块包定义，确保完整构建将模块装入 rootfs |
+| `openwrt/target/v861/v861-avaota_f2/busybox-init-base-files/etc/init.d/S00mpp` | 在 VIN 之前加载 GC2093，停止时卸载 |
 
-SDK原有 `gc2093_mipi.c` 没有修改，因此不重复收录。干净SDK验证发现，仅提供设备树和两个defconfig会遗漏OpenWrt包定义与BusyBox启动加载；现已补齐。五个文件均从原始SDK基线生成，只保留GC2093所需差异，TDM模式和CPU频率保持原SDK默认值。
+SDK 原有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c` 无需修改，因此不重复收录。VIN/ISP 公共驱动、CPU 频率、TDM、TF 卡和 WiFi 配置均保持原始 SDK 默认值。本次内核未启用 TDM，不需要给 `insmod` 添加传感器参数，启动脚本自动加载模块。
 
-可以按SDK原路径覆盖 `source/` 五个文件，或在原始SDK根目录应用 `patches/gc2093-driver-minimal.patch`，二选一。已有自定义配置时应先审查差异，避免覆盖自己的设置。
+模组的 **7 位 I²C 地址为 0x7e**；VIN 将设备树地址字段右移一位，因此 `sensor0_twi_addr` 填 **0xfc**。现有 RESET 为 PA14，PWDN 未单独控制；模组与接线改变时应重新核对电源和控制脚。
 
-OpenWrt的ISP效果选择保持原SDK默认值，本分支只选择GC2093内核驱动包，RAW测试不启动ISP。
+本分支验证驱动识别及 RAW 收帧，未交付 GC2093 专用 ISP 调校。OpenWrt 的 ISP 库选择保持原 SDK 默认值；本测试绕过 ISP，不代表 YUV 颜色或编码效果已经验证。
 
-测试方法见 [test/README.md](test/README.md)。测试应用源码和脚本不属于需要覆盖到SDK中的驱动修改；预编译应用在SDK主机执行 `test/build-test.sh` 后生成。
+## 干净 SDK 完整编译（Ubuntu 主机）
 
-## 本次实际修改
-
-SDK已有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c`，无需修改寄存器驱动。板级适配包括：I²C1、MIPI0/CSI0、MCLK1、模组供电及复位选择，驱动编译和固件打包，以及BusyBox启动加载。
-
-本模组的**7位I²C地址是0x7e**。VIN将设备树的该字段右移一位，因此 `sensor0_twi_addr` 填0xfc；用户态i2ctransfer仍使用0x7e。
-
-## 干净SDK复现（Ubuntu SDK主机）
-
-先从原始 `tina-v861-v1.1.tar.xz` 解压新SDK，并取得本分支。以下假设仓库在 `$PATCH_DIR`、SDK在 `$SDK_DIR`，两者均设置为实际绝对路径：
+先解压原始 `tina-v861-v1.1.tar.xz` 到新目录。将以下两个路径改为实际绝对路径，SDK 与仓库分开存放：
 
 ```sh
 SDK_DIR=/home/ubuntu/tina-v861-v1.1
 PATCH_DIR=/home/ubuntu/Downloads/avaota-f2-patches
+git clone --branch gc2093-support --single-branch https://github.com/dshanpi/avaota-f2-patches.git "$PATCH_DIR"
 cd "$SDK_DIR"
 ./build.sh autoconfig -i v861 -o openwrt -b avaota_f2 -n nor -k linux-6.6-xuantie -a riscv32
 cp -a "$PATCH_DIR/source/." "$SDK_DIR/"
@@ -53,48 +47,25 @@ cp openwrt/target/v861/v861-avaota_f2/defconfig openwrt/openwrt/.config
 ./build.sh pack
 ```
 
-完整编译使内核驱动选择和OpenWrt模块打包配置共同生效。SDK首次配置时如出现原厂许可提示，请按原SDK流程处理。固件输出为 `out/v861_linux_avaota_f2_uart0_nor.img`。这套流程正在本次新解压SDK上完整验证；在验证完成前不将其列为已通过。
+仓库已存在时跳过 clone，并确认使用 `gc2093-support` 分支。首次使用 SDK 时按原厂流程处理许可提示。固件输出为 `out/v861_linux_avaota_f2_uart0_nor.img`。使用匹配本板的烧录工具烧录该整包并校验，重新上电后通过串口测试。
 
-若采用补丁方式，请先在原始SDK根目录执行 `patch --dry-run -p1 < /path/to/gc2093-driver-minimal.patch`，确认后应用，再执行相同的完整构建流程。已经覆盖过 `source/` 的SDK不需要再套同一补丁。
+已有自定义设置时先审查差异，避免整文件覆盖自己的修改。也可在原始 SDK 根目录先执行 `patch --dry-run -p1 < /absolute/path/to/gc2093-driver-minimal.patch`，确认后去掉 `--dry-run` 应用补丁，再执行上述配置加载和完整构建。覆盖 `source/` 与应用补丁二选一，不要重复应用。
+
+干净构建曾发现只有设备树和两个 defconfig 不足以把模块打包并自动加载，现已补齐 `modules.mk` 与 `S00mpp`；五文件补丁生成的结果与 `source/` 逐字节一致。
 
 ## 测试（开发板串口）
 
-先在Ubuntu主机编译测试应用，将整个 `test` 目录复制到普通TF卡根目录并改名为 `gc2093-test`，再插入开发板。详见 [test/README.md](test/README.md)。
-
-串口115200、8N1进入Linux命令行后，确认TF卡挂载在 `/mnt/extsd`，执行：
+完整步骤见 [test/README.md](test/README.md)。所有板端测试命令在串口执行，115200、8N1。支持通过串口发送文本脚本把应用放入 `/tmp`，无需 ADB 或 TF 卡；有已正常工作的 TF 卡时也可离线复制文件。
 
 ```sh
-cd /mnt/extsd/gc2093-test
-chmod +x gc2093_raw_test
+dmesg | grep -i gc2093
+lsmod | grep gc2093
+ls -l /dev/video0
+cd /tmp/gc2093-test
 sh run-camera-test.sh
+cat /tmp/gc2093-raw-test/exit-code.txt
 ```
 
-测试结果在 `/mnt/extsd/gc2093-raw-test/`。若挂载路径不同，修改命令中的路径及测试配置的 `OUTPUT_DIR`。板端命令统一直接在串口执行，SDK编译命令在Ubuntu主机执行。
+识别成功应读到 ID 高字节 0x20、低字节 0x93。采集程序返回码为 0，且输出 `error_flags=0 sequence_gaps=0` 才表示本轮收帧通过。
 
-## 适配配置核对
-
-以下是驱动适配所需配置；选择项与模块集成一并保存在 `source/` 供外发使用：
-
-```dts
-sensor0_mname = "gc2093_mipi";
-sensor0_twi_cci_id = <1>;
-sensor0_mclk_id = <1>;
-sensor0_reset = <&pio PA 14 GPIO_ACTIVE_LOW>;
-sensor0_pwdn = <>;
-```
-
-- 内核：`CONFIG_SENSOR_GC2093_MIPI=m`。
-- OpenWrt：`CONFIG_PACKAGE_kmod-sensor-gc2093=y`。
-- 使用四Lane接口中的MIPI0/CSI0，GC2093本次实际输出为双Lane1080P30线性模式。
-- 模组内置24MHz晶振，现有RESET/PWDN接线可正常读ID，不额外改动控制脚。
-
-尚未选择这些配置的干净SDK，需要先核对板级路由、供电复位和模块选项；本分支不宣称这一行补丁能替代所有板级配置。
-
-## 驱动验证
-
-- 内核编译、固件打包、LYNX烧录与校验成功。
-- 启动自动读取GC2093芯片ID `0x2093`，产生 `/dev/video0` 等节点，无需附加模块参数。
-- 1080P30 RAW一分钟采集1800帧，实测30.0061fps，帧错误标志0、序号缺口0。
-- 较早300帧短测有1次序号缺口，随后一分钟复测未复现；未将其描述为全部测试零丢帧。
-
-验证范围为驱动识别和RAW收帧。ISP调校、YUV/编码和其他模式不属于本分支交付范围。
+原 SDK 的 TF 卡检测配置在本次实物上未识别到卡，因此本次验证采用 `/tmp` 串口传输路径。自动识别和挂载 TF 卡不属于这个 GC2093 驱动补丁的修改范围。

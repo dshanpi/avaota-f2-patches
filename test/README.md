@@ -1,84 +1,67 @@
-# GC2093 RAW 驱动测试
+# GC2093 1080P30 RAW 串口测试
 
-本目录验证驱动识别、RAW收帧和帧率，不启动ISP或编码器。
+测试固定使用 `/dev/video0`、1920×1080 RAW10、30fps、三个 MMAP 缓冲；不启动 ISP 和编码器。
 
-## 1. 在Ubuntu SDK主机编译应用
+## 1. Ubuntu SDK 主机编译
 
-以下编译命令在Ubuntu主机的仓库根目录执行：
+在本分支仓库根目录执行，SDK 路径改为实际值：
 
 ```sh
 sh test/build-test.sh /home/ubuntu/tina-v861-v1.1
+python3 test/make-serial-upload.py
 ```
 
-生成 `test/gc2093_raw_test`，使用SDK自带的RISC-V32 musl交叉编译器静态链接。如工具链目录不同，可设置 `CC=/absolute/path/to/riscv32-unknown-linux-musl-gcc`。
+使用 SDK 自带 RISC-V32 musl 工具链静态链接，生成 `test/gc2093_raw_test`。工具链位置不同时可通过 `CC=/absolute/path/to/riscv32-unknown-linux-musl-gcc` 指定。
 
-## 2. 将测试文件复制到TF卡
+## 2. 通过串口传入 /tmp（本次实测方式）
 
-在电脑上，将编译后的整个 `test` 目录复制到普通TF卡根目录，并重命名为 `gc2093-test`。目录中应包含：
+串口 115200、8N1，先确认已进入 Linux shell。将上一步生成的 `test/uart-upload.txt` 复制到串口终端所在电脑，使用终端的“发送文本文件”功能发送内容；使用 LF 换行，每行发送间隔至少 20ms。这是供 shell 执行的文本，不要用二进制文件传输模式发送它。
 
-```text
-gc2093-test/
-├── gc2093_raw_test
-├── run-camera-test.sh
-└── raw-1080p30.conf
+生成器只使用 `mkdir`、shell 内建 `printf`、`chmod` 和 `md5sum`，不依赖 `stty`、base64、ZMODEM 或 ADB。脚本逐段重建应用、运行脚本和配置到 `/tmp/gc2093-test`。等到输出 `GC2093_UPLOAD_DONE` 后，检查终端打印的应用 MD5 与主机生成器打印的预期值一致；不一致时重新完整发送，不要运行残缺程序。
+
+然后在开发板串口执行：
+
+```sh
+dmesg | grep -i gc2093
+lsmod | grep gc2093
+ls -l /dev/video0
+cd /tmp/gc2093-test
+sh run-camera-test.sh
+cat /tmp/gc2093-raw-test/exit-code.txt
+tail -n 3 /tmp/gc2093-raw-test/capture.log
+ls -l /tmp/gc2093-raw-test/frame.raw
 ```
 
-安全弹出TF卡后插入开发板。文件准备完成后，以下板端操作全部在开发板串口终端执行。
+默认采集 1800 帧，约一分钟；停流后保存最后一帧，不在采集中同步写文件占用缓冲区。结果保存在 `/tmp/gc2093-raw-test/`，断电丢失；需要保留时先复制日志和 RAW 文件。
 
-## 3. 在开发板串口启动测试
+## 3. 可选：用已经正常工作的 TF 卡复制
 
-串口设置为115200、8N1，进入Linux命令行。先确认TF卡挂载路径：
+在电脑上将编译后的 `test` 目录复制到 TF 卡根目录，改名为 `gc2093-test`，至少包含可执行文件、`run-camera-test.sh` 和 `raw-1080p30.conf`。安全弹出后插入开发板，确认卡已挂载到 `/mnt/extsd`。
+
+在开发板串口执行：
 
 ```sh
 mount
 ls /mnt/extsd/gc2093-test
-```
-
-以下以TF卡挂载到 `/mnt/extsd` 为例，直接执行：
-
-```sh
 cd /mnt/extsd/gc2093-test
 chmod +x gc2093_raw_test
 sh run-camera-test.sh
-```
-
-默认采集1800帧，约一分钟，结果保存到 `/mnt/extsd/gc2093-raw-test/`。如果TF卡实际挂载到其他路径，请将上述目录以及 `raw-1080p30.conf` 中的 `OUTPUT_DIR` 改为对应路径。
-
-测试结束后，在同一串口终端查看结果：
-
-```sh
 cat /mnt/extsd/gc2093-raw-test/exit-code.txt
-cat /mnt/extsd/gc2093-raw-test/capture.log
-ls -lh /mnt/extsd/gc2093-raw-test/frame.raw
 ```
 
-也可以在串口中直接调用应用，省去配置文件：
+仓库配置文件的 `OUTPUT_DIR` 默认为 `/mnt/extsd/gc2093-raw-test`；串口传输生成器仅在传输副本中将其改为 `/tmp/gc2093-raw-test`。其他挂载路径自行调整命令及 `OUTPUT_DIR`。本分支不修改原 SDK 的 TF 卡检测配置；卡未识别时请用第 2 节。
 
-```sh
-/mnt/extsd/gc2093-test/gc2093_raw_test 1800 /mnt/extsd/gc2093-frame.raw
-```
+## 4. 结果与 RAW 格式
 
-传入保存路径时，采集到第11帧会保存一帧；省略该参数仅测收帧，例如 `gc2093_raw_test 1800`。设置 `SAVE_FRAME=0` 可由脚本进行不保存图片的测试。
-
-若希望将结果保存在内存中，可将配置的 `OUTPUT_DIR` 改为 `/tmp/gc2093-raw-test`；单帧约4MiB，重启后结果会丢失。
-
-## 4. 判断结果
-
-应用打印实际协商尺寸、fourcc、帧序号、时间戳和帧长度，结束打印：
+成功示例的关键字段为：
 
 ```text
 RESULT frames=1800 elapsed=... fps=... error_flags=0 sequence_gaps=0
+Capture exit code: 0
 ```
 
-帧率按 `(帧数−1)/(末帧时间戳−首帧时间戳)` 计算。返回0表示采集完成且未出现ERROR标志和序号缺口；返回2表示存在帧错误或序号缺口；返回1表示打开设备、配置、等待帧或其他操作失败。脚本保留应用返回码并写入 `exit-code.txt`，不会把失败输出成通过。
+帧率按 `(帧数−1)/(末帧时间戳−首帧时间戳)` 计算。返回 0：完成且无 ERROR 标志或序号缺口；返回 2：有帧错误或缺口；返回 1：设备、配置、等待帧或保存失败。脚本原样保留返回码，不将失败输出为通过。设置 `SAVE_FRAME=0` 可只测收帧。
 
-本程序固定使用 `/dev/video0`、1920×1080 RAW10、30fps、三个MMAP缓冲。该SDK实际返回每帧4177920字节，对应1920×1088×2，包含高度对齐填充；显示图像时应只取可见1080行。
+单帧实际为 4177920 字节，即 1920×1088×2，包含高度对齐；可见图像取前 1080 行。驱动未翻转时报告的 Bayer 顺序为 RGGB；请求 BG10 不代表已经重排像素。RAW 不能直接当作 JPEG 或 YUV 打开。
 
-GC2093驱动报告未翻转时的Bayer顺序为RGGB；V4L2请求fourcc BG10不等于驱动已重排Bayer像素。RAW文件不能直接当作JPEG或YUV打开。
-
-## 既有板端实测
-
-- 1800帧不保存测试：30.0061fps，ERROR标志0，序号缺口0。
-- 300帧保存测试：29.9061fps，ERROR标志0，序号缺口1；已如实保留该结果，没有宣称所有测试零丢帧。
-
-这些是本次驱动适配的既有实测记录。新增脚本只负责调用同一采集程序和保存返回码，不代表又完成了新一轮一分钟长测。
+实测结果及首轮缺口记录见 [干净 SDK 验证记录](../docs/clean-sdk-validation.md)，完整串口日志在 [results/20261110](results/20261110)。本次一分钟测试不能替代长时间或 ISP/编码验证。

@@ -1,0 +1,40 @@
+sleep 1; uname -a; cat /proc/sys/kernel/random/boo
+t_id
+Linux (none) 6.6.0 #1 SMP Tue Nov 10 04:57:16 EST 2026 riscv32 GNU/Linux
+c2f652c8-4c87-4cb1-bcb5-51887c9a5977
+root@(none):/tmp/gc2093-test#
+
+sleep 1; md5sum /lib/modules/6.6.0/gc2093_mipi.ko
+/tmp/gc2093-test/gc2093_raw_test; ls -l /dev/video0
+ae94cd588b5712b31671a24406db195a  /lib/modules/6.6.0/gc2093_mipi.ko
+4565f338d7753c49e192bd5345d905c4  /tmp/gc2093-test/gc2093_raw_test
+crw-------    1 root     root       81,   0 Jan  1 00:00 /dev/video0
+root@(none):/tmp/gc2093-test#
+
+sleep 1; dmesg | grep -E 'ID_VAL_HIGH =|ID_VAL_LOW
+ =' | tail -4
+[  223.513092] sunxi:vin :[INFO]: [gc2093_mipi]ID_VAL_HIGH = 20, Done!
+[  223.520277] sunxi:vin :[INFO]: [gc2093_mipi]ID_VAL_LOW = 93, Done!
+[  568.469151] sunxi:vin :[INFO]: [gc2093_mipi]ID_VAL_HIGH = 20, Done!
+[  568.476337] sunxi:vin :[INFO]: [gc2093_mipi]ID_VAL_LOW = 93, Done!
+root@(none):/tmp/gc2093-test#
+
+sleep 1; dmesg | grep -iE 'frame.*error|line.*erro
+r|fifo.*overflow|mipi.*error' | tail -10; echo GC2093_ERROR_CHECK_DONE
+GC2093_ERROR_CHECK_DONE
+root@(none):/tmp/gc2093-test#
+
+sleep 1; cat /tmp/gc2093-raw-test/exit-code.txt; c
+at /tmp/gc2093-test/raw-1080p30.conf
+0
+# Settings for run-camera-test.sh. Fixed sensor mode: 1920x1080 RAW10, 30fps.
+FRAME_COUNT=1800
+OUTPUT_DIR=/tmp/gc2093-raw-test
+SAVE_FRAME=1
+root@(none):/tmp/gc2093-test#
+
+sleep 1; wc -c /tmp/gc2093-raw-test/frame.raw; md5
+sum /tmp/gc2093-raw-test/frame.raw
+4177920 /tmp/gc2093-raw-test/frame.raw
+a3b5d4d979658b46433fc7cf5ab0fff9  /tmp/gc2093-raw-test/frame.raw
+root@(none):/tmp/gc2093-test#
