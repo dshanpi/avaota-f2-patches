@@ -12,9 +12,21 @@ source-manifest.json         source文件SHA-256清单
 SHA256SUMS                  交付文件校验值
 ```
 
-`source/` 与主分支采用相同布局，当前只放实际修改的 `board.dts`。SDK原有 `gc2093_mipi.c` 没有修改，因此不重复收录。完整设备树保留原用户SDK已有设置；本次增量仍只有地址一行，请结合补丁审查，避免将既有设置当成本次新增修改。
+`source/` 与主分支采用相同布局，保存驱动适配所需的完整板级文件和选中配置：
 
-可以按原SDK路径覆盖 `source/` 中的文件，或应用 `patches/` 中的补丁，二选一即可。整文件替换适用于相同SDK/板级配置基线；其他版本先审查差异。
+| SDK相对路径 | 用途 |
+|---|---|
+| `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/board.dts` | GC2093地址、总线、路由及复位配置 |
+| `device/config/chips/v861/configs/avaota_f2/linux-6.6-xuantie/bsp_defconfig` | `CONFIG_SENSOR_GC2093_MIPI=m`，编译GC2093内核模块 |
+| `openwrt/target/v861/v861-avaota_f2/defconfig` | `CONFIG_PACKAGE_kmod-sensor-gc2093=y`，把模块打包进固件并参与自动加载 |
+
+SDK原有 `gc2093_mipi.c` 没有修改，因此不重复收录。此前只收录设备树会遗漏外发时必要的选中配置，现在补齐这两个配置文件。它们是本次已验证SDK的完整配置，保留用户原SDK既有设置；GC2093选择项原已启用，不能把完整文件中所有选项都计作此次新增修改。
+
+注意，OpenWrt配置里的 `CONFIG_ov13850=y` 是原SDK已有的ISP效果库编译选项，**不是**内核驱动选择；传感器驱动包实际由 `CONFIG_PACKAGE_kmod-sensor-gc2093=y` 选择。本分支只交付驱动适配，未为了删除历史ISP选项而扩大修改范围。
+
+相同SDK/板级配置基线下，可按SDK原路径覆盖 `source/` 中的三个文件。已有其他板级定制时，应合并设备树和上述两个GC2093选择项，避免整文件覆盖自己的设置。
+
+`patches/gc2093-driver-minimal.patch` 保留为**已选中GC2093的用户SDK上仅修正地址的一行增量**，它不重复包含原已启用的驱动配置。尚未选中驱动时，不能只套用这个地址补丁而漏掉两个配置项。
 
 测试方法见 [test/README.md](test/README.md)。测试应用源码和脚本不属于需要覆盖到SDK中的驱动修改；预编译应用在SDK主机执行 `test/build-test.sh` 后生成。
 
@@ -35,7 +47,14 @@ SDK已有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c`，已能驱动这颗模
 
 ## 应用（Ubuntu SDK主机）
 
-在当前已选择 `v861-avaota_f2-tina` 并启用GC2093的SDK根目录：
+先选择 `v861-avaota_f2-tina` 配置，将仓库 `source/` 的文件按原相对路径复制到匹配的SDK，或合并对应设置。随后在SDK根目录完整编译并打包，使内核模块选择和OpenWrt模块打包配置都生效：
+
+```sh
+./build.sh
+./build.sh pack
+```
+
+如果当前SDK已经选中并打包了GC2093，只需要地址修正，也可以使用一行补丁：
 
 ```sh
 patch --dry-run -p1 < /path/to/gc2093-driver-minimal.patch
@@ -44,7 +63,7 @@ patch -p1 < /path/to/gc2093-driver-minimal.patch
 ./build.sh pack
 ```
 
-补丁基线为本次用户正在使用、已选好GC2093的SDK，完整差异仅1处、1行。若设备树已经是0xfc，不必重复应用。
+该地址补丁基线为本次用户正在使用、已选好GC2093的SDK，差异仅1处、1行。若设备树已经是0xfc，不必重复应用。
 
 ## 测试（开发板串口）
 
@@ -62,7 +81,7 @@ sh run-camera-test.sh
 
 ## 原SDK已具备的配置
 
-以下是适用前提，不计入本次新增修改：
+以下是驱动适配所需配置；原已启用的选择项也一并保存在 `source/` 供外发使用：
 
 ```dts
 sensor0_mname = "gc2093_mipi";
