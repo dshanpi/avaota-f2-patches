@@ -33,7 +33,7 @@ SDK已有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c`，已能驱动这颗模
 
 本模组的**7位I²C地址是0x7e**。VIN将设备树的该字段右移一位，因此必须填0xfc；填0x7e时会错误访问0x3f。用户态i2ctransfer仍使用0x7e，不使用0xfc。
 
-## 应用
+## 应用（Ubuntu SDK主机）
 
 在当前已选择 `v861-avaota_f2-tina` 并启用GC2093的SDK根目录：
 
@@ -45,6 +45,20 @@ patch -p1 < /path/to/gc2093-driver-minimal.patch
 ```
 
 补丁基线为本次用户正在使用、已选好GC2093的SDK，完整差异仅1处、1行。若设备树已经是0xfc，不必重复应用。
+
+## 测试（开发板串口）
+
+先在Ubuntu主机编译测试应用，将整个 `test` 目录复制到普通TF卡根目录并改名为 `gc2093-test`，再插入开发板。详见 [test/README.md](test/README.md)。
+
+串口115200、8N1进入Linux命令行后，确认TF卡挂载在 `/mnt/extsd`，执行：
+
+```sh
+cd /mnt/extsd/gc2093-test
+chmod +x gc2093_raw_test
+sh run-camera-test.sh
+```
+
+测试结果在 `/mnt/extsd/gc2093-raw-test/`。若挂载路径不同，修改命令中的路径及测试配置的 `OUTPUT_DIR`。板端命令统一直接在串口执行，SDK编译命令在Ubuntu主机执行。
 
 ## 原SDK已具备的配置
 

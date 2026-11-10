@@ -2,7 +2,9 @@
 
 本目录验证驱动识别、RAW收帧和帧率，不启动ISP或编码器。
 
-## 1. 在SDK主机编译应用
+## 1. 在Ubuntu SDK主机编译应用
+
+以下编译命令在Ubuntu主机的仓库根目录执行：
 
 ```sh
 sh test/build-test.sh /home/ubuntu/tina-v861-v1.1
@@ -10,29 +12,57 @@ sh test/build-test.sh /home/ubuntu/tina-v861-v1.1
 
 生成 `test/gc2093_raw_test`，使用SDK自带的RISC-V32 musl交叉编译器静态链接。如工具链目录不同，可设置 `CC=/absolute/path/to/riscv32-unknown-linux-musl-gcc`。
 
-## 2. 传入板端
+## 2. 将测试文件复制到TF卡
 
-先确认ADB连接到待测摄像头板，再执行：
+在电脑上，将编译后的整个 `test` 目录复制到普通TF卡根目录，并重命名为 `gc2093-test`。目录中应包含：
 
-```sh
-adb push test /tmp/gc2093-test
-adb shell 'chmod +x /tmp/gc2093-test/gc2093_raw_test'
-adb shell 'sh /tmp/gc2093-test/run-camera-test.sh'
+```text
+gc2093-test/
+├── gc2093_raw_test
+├── run-camera-test.sh
+└── raw-1080p30.conf
 ```
 
-默认配置为1800帧、保存一帧到 `/mnt/extsd/gc2093-raw-test`，约一分钟。请先通过 `mount` 确认普通TF卡已挂载到 `/mnt/extsd`；若挂载在其他路径，请修改 `raw-1080p30.conf` 中的 `OUTPUT_DIR`。没有TF卡时可以使用 `/tmp/gc2093-raw-test`，单帧约4MiB，重启后会丢失。
+安全弹出TF卡后插入开发板。文件准备完成后，以下板端操作全部在开发板串口终端执行。
 
-传输目录后，板端文件结构应为 `/tmp/gc2093-test/gc2093_raw_test`、`run-camera-test.sh` 和 `raw-1080p30.conf`；若目的目录之前存在，请检查ADB实际生成的目录层级。
+## 3. 在开发板串口启动测试
 
-测试应用也可以直接执行：
+串口设置为115200、8N1，进入Linux命令行。先确认TF卡挂载路径：
 
 ```sh
-/tmp/gc2093-test/gc2093_raw_test 1800 /mnt/extsd/gc2093-frame.raw
+mount
+ls /mnt/extsd/gc2093-test
+```
+
+以下以TF卡挂载到 `/mnt/extsd` 为例，直接执行：
+
+```sh
+cd /mnt/extsd/gc2093-test
+chmod +x gc2093_raw_test
+sh run-camera-test.sh
+```
+
+默认采集1800帧，约一分钟，结果保存到 `/mnt/extsd/gc2093-raw-test/`。如果TF卡实际挂载到其他路径，请将上述目录以及 `raw-1080p30.conf` 中的 `OUTPUT_DIR` 改为对应路径。
+
+测试结束后，在同一串口终端查看结果：
+
+```sh
+cat /mnt/extsd/gc2093-raw-test/exit-code.txt
+cat /mnt/extsd/gc2093-raw-test/capture.log
+ls -lh /mnt/extsd/gc2093-raw-test/frame.raw
+```
+
+也可以在串口中直接调用应用，省去配置文件：
+
+```sh
+/mnt/extsd/gc2093-test/gc2093_raw_test 1800 /mnt/extsd/gc2093-frame.raw
 ```
 
 传入保存路径时，采集到第11帧会保存一帧；省略该参数仅测收帧，例如 `gc2093_raw_test 1800`。设置 `SAVE_FRAME=0` 可由脚本进行不保存图片的测试。
 
-## 3. 判断结果
+若希望将结果保存在内存中，可将配置的 `OUTPUT_DIR` 改为 `/tmp/gc2093-raw-test`；单帧约4MiB，重启后结果会丢失。
+
+## 4. 判断结果
 
 应用打印实际协商尺寸、fourcc、帧序号、时间戳和帧长度，结束打印：
 
