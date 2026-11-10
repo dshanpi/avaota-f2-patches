@@ -2,6 +2,22 @@
 
 本分支仅存放GC2093驱动适配所需的最小增量。ISP效果参数、照片和采集应用属于其他调试资料，不纳入本分支。
 
+## 目录结构
+
+```text
+source/                     补丁对应的完整修改后源码，保持SDK原路径
+patches/                    GC2093驱动最小差异补丁
+test/                       RAW采集应用源码、构建脚本、运行脚本和配置
+source-manifest.json         source文件SHA-256清单
+SHA256SUMS                  交付文件校验值
+```
+
+`source/` 与主分支采用相同布局，当前只放实际修改的 `board.dts`。SDK原有 `gc2093_mipi.c` 没有修改，因此不重复收录。完整设备树保留原用户SDK已有设置；本次增量仍只有地址一行，请结合补丁审查，避免将既有设置当成本次新增修改。
+
+可以按原SDK路径覆盖 `source/` 中的文件，或应用 `patches/` 中的补丁，二选一即可。整文件替换适用于相同SDK/板级配置基线；其他版本先审查差异。
+
+测试方法见 [test/README.md](test/README.md)。测试应用源码和脚本不属于需要覆盖到SDK中的驱动修改；预编译应用在SDK主机执行 `test/build-test.sh` 后生成。
+
 ## 本次实际修改
 
 SDK已有 `bsp/drivers/vin/modules/sensor/gc2093_mipi.c`，已能驱动这颗模组，本次无需修改或复制该文件。
