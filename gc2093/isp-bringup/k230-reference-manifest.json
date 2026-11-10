@@ -1,0 +1,55 @@
+{
+  "commit": "dad154b3a29d895dc28f95fa1f1eb4bbba2ee7be",
+  "files": [
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x720.xml",
+      "sha256": "b4e89f577b19d1535b59579eb48189aee4f05b42d55a3354de4f816e6ca76606",
+      "bytes": 187116
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x720_auto.json",
+      "sha256": "46a595d4f32216b2fa8b4a0301c8590fe5de383cb2cfe9c0d180882aab374dc3",
+      "bytes": 41551
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x720_manual.json",
+      "sha256": "cf421e6f226b69c159a45dfc60634cfe5dc641222865dce6ccf56945128ca65e",
+      "bytes": 38489
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x960.xml",
+      "sha256": "c0da9c06fe780fb3e32689df1a28a6a054b34ee7e1cc1aa21c91f66386c5a139",
+      "bytes": 187116
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x960_auto.json",
+      "sha256": "46a595d4f32216b2fa8b4a0301c8590fe5de383cb2cfe9c0d180882aab374dc3",
+      "bytes": 41551
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x960_manual.json",
+      "sha256": "8dd44d7bafa8cc2d7179757e2970a0f11158d0e3423afcb3c8fc272919bb7542",
+      "bytes": 38489
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1920x1080.xml",
+      "sha256": "ef5ecb378442897a81799a6e61c40d815be2aed7e4f15f932cc4ed25dfed7396",
+      "bytes": 187093
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1920x1080_auto.json",
+      "sha256": "0909bd73139113196fb7d3414be95159092c45b166c213e1fa0c4a64cae0bb4e",
+      "bytes": 41556
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/configs/gc2093-1920x1080_manual.json",
+      "sha256": "f1b20325dee6723084d0286301702e49f6d8b860be24492bc182822f2b8b57b6",
+      "bytes": 38495
+    },
+    {
+      "path": "buildroot-overlay/package/vvcam/src/gc2093.c",
+      "sha256": "1751cb8fdfefe0dd3cc532aaa6ce83fe20241ba763715741d514d5a1ff893538",
+      "bytes": 53962
+    }
+  ]
+}

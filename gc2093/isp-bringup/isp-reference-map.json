@@ -1,0 +1,217 @@
+{
+  "k230": {
+    "commit": "dad154b3a29d895dc28f95fa1f1eb4bbba2ee7be",
+    "files": [
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x720.xml",
+        "sha256": "b4e89f577b19d1535b59579eb48189aee4f05b42d55a3354de4f816e6ca76606",
+        "bytes": 187116
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x720_auto.json",
+        "sha256": "46a595d4f32216b2fa8b4a0301c8590fe5de383cb2cfe9c0d180882aab374dc3",
+        "bytes": 41551
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x720_manual.json",
+        "sha256": "cf421e6f226b69c159a45dfc60634cfe5dc641222865dce6ccf56945128ca65e",
+        "bytes": 38489
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x960.xml",
+        "sha256": "c0da9c06fe780fb3e32689df1a28a6a054b34ee7e1cc1aa21c91f66386c5a139",
+        "bytes": 187116
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x960_auto.json",
+        "sha256": "46a595d4f32216b2fa8b4a0301c8590fe5de383cb2cfe9c0d180882aab374dc3",
+        "bytes": 41551
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1280x960_manual.json",
+        "sha256": "8dd44d7bafa8cc2d7179757e2970a0f11158d0e3423afcb3c8fc272919bb7542",
+        "bytes": 38489
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1920x1080.xml",
+        "sha256": "ef5ecb378442897a81799a6e61c40d815be2aed7e4f15f932cc4ed25dfed7396",
+        "bytes": 187093
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1920x1080_auto.json",
+        "sha256": "0909bd73139113196fb7d3414be95159092c45b166c213e1fa0c4a64cae0bb4e",
+        "bytes": 41556
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/configs/gc2093-1920x1080_manual.json",
+        "sha256": "f1b20325dee6723084d0286301702e49f6d8b860be24492bc182822f2b8b57b6",
+        "bytes": 38495
+      },
+      {
+        "path": "buildroot-overlay/package/vvcam/src/gc2093.c",
+        "sha256": "1751cb8fdfefe0dd3cc532aaa6ce83fe20241ba763715741d514d5a1ff893538",
+        "bytes": 53962
+      }
+    ]
+  },
+  "illuminants": {
+    "A": {
+      "wb": [
+        0.951171875,
+        1.0,
+        1.0,
+        2.952148438
+      ],
+      "ccm": [
+        1.171875,
+        0.2109375,
+        -0.3828125,
+        -0.1875,
+        1.3125,
+        -0.125,
+        -0.0234375,
+        -0.6640625,
+        1.6875
+      ]
+    },
+    "D50": {
+      "wb": [
+        1.390625,
+        1.0,
+        1.0,
+        1.943359375
+      ],
+      "ccm": [
+        1.0625,
+        0.1796875,
+        -0.2421875,
+        -0.109375,
+        1.2578125,
+        -0.1484375,
+        0.078125,
+        -0.2578125,
+        1.1796875
+      ]
+    },
+    "D65": {
+      "wb": [
+        1.559570313,
+        1.0,
+        1.0,
+        1.715820313
+      ],
+      "ccm": [
+        1.0546875,
+        0.0234375,
+        -0.078125,
+        -0.1015625,
+        1.265625,
+        -0.1640625,
+        0.046875,
+        -0.0078125,
+        0.9609375
+      ]
+    },
+    "F11 (TL84)": {
+      "wb": [
+        1.288085938,
+        1.0,
+        1.0,
+        2.265625
+      ],
+      "ccm": [
+        1.0859375,
+        0.0234375,
+        -0.109375,
+        -0.1875,
+        1.265625,
+        -0.078125,
+        0.0625,
+        -0.21875,
+        1.15625
+      ]
+    },
+    "F12": {
+      "wb": [
+        1.0234375,
+        1.0,
+        1.0,
+        2.85546875
+      ],
+      "ccm": [
+        1.0546875,
+        0.078125,
+        -0.1328125,
+        -0.2734375,
+        1.3515625,
+        -0.078125,
+        0.015625,
+        -0.4296875,
+        1.4140625
+      ]
+    }
+  },
+  "v861_awb_ratios": [
+    [
+      269,
+      256,
+      87,
+      256,
+      256,
+      256,
+      45,
+      2850,
+      45,
+      100
+    ],
+    [
+      250,
+      256,
+      90,
+      256,
+      256,
+      256,
+      45,
+      3000,
+      45,
+      100
+    ],
+    [
+      199,
+      256,
+      113,
+      256,
+      256,
+      256,
+      45,
+      4000,
+      45,
+      100
+    ],
+    [
+      184,
+      256,
+      132,
+      256,
+      256,
+      256,
+      45,
+      5000,
+      45,
+      100
+    ],
+    [
+      164,
+      256,
+      149,
+      256,
+      256,
+      256,
+      45,
+      6500,
+      45,
+      100
+    ]
+  ],
+  "conversion": "AWB white scene R/G and B/G ratios are reciprocal of normalized K230 WB gains, Q8; CCM coefficients Q8; BLS64 checked, V861 baseline offsets -64 retained; LSC/MSC disabled, AE capped to 30fps and16x, delay2frames. K230 AWB GMM and LSC grids are not copied."
+}
