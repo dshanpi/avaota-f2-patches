@@ -1,3 +1,5 @@
+> 后续 ISP 初始出图进展见 [ISP 实测与使用方法](isp-bringup/README.md)，含实拍照片、源码及补丁。以下保留最初的 RAW 驱动验证范围。
+
 # V861 Avaota F2 GC2093 驱动适配
 
 本目录适用于用户当前的 `v861-avaota_f2-tina` SDK 和图示内置 24MHz 晶振、7 位 I²C 地址 0x7e 的 GC2093 模组。GC2093 支持先沿用 SDK 已有的 1920×1080、30fps、双 Lane 线性模式。
