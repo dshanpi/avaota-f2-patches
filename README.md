@@ -80,6 +80,8 @@ wpa_cli -p /tmp/wpa_supplicant -i wlan0 terminate
 
 ## 预编译固件和测试应用
 
+[v0.3.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.3.0) 增加 RTSP 可执行应用、完整测试源码、构建脚本和参数，沿用并核对 v0.2.0 的同一份 TF WiFi 联网固件。使用方法见 [RTSP 测试与源码编译](docs/rtsp-test-v0.3.0.md)，附件说明见 [v0.3.0 发布说明](docs/release-v0.3.0.md)。本轮一分钟功能复测通过 1080P30、2K30；**4K 未通过，仍为实验模式**。完整源码包含原版 smartIPC C/H、公共示例辅助代码、配置解析器及新增 RTSP/ISP 导出源码，编译仍依赖匹配版本 Tina SDK 的工具链和 MPP 库。
+
 [v0.2.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.2.0) 提供 **TF WiFi 联网版固件**、完整源码与补丁、WiFi 连接方法及实测记录，并附带沿用 v0.1.0 的摄像头测试应用。下载后先校验 Release 的 SHA256SUMS，烧录完整新固件。独立 WiFi 操作说明见 [WIFI_CONNECT](docs/wifi-connect-v0.2.0.md)。
 
 同一插槽不能同时插普通 TF 卡和 SDIO WiFi 卡。摄像头测试包原脚本使用 `/mnt/SDCARD` 保存图片，运行它时需换回普通存储卡；本轮主要新增联网测试，没有重复进行全部摄像头模式的图像验收。
