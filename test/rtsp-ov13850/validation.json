@@ -226,5 +226,111 @@
     "rtsp_library_byte_identical": true,
     "profiles_effective_values_identical": true,
     "note": "Only trailing whitespace on blank config assignments was removed for publication; frame captures were made before publication cleanup."
+  },
+  "readme_reproduction": {
+    "date": "2026-11-11",
+    "tested_commit": "befc0aed893ea483a5ebc2f13fa0ca2a1620faf5",
+    "fresh_github_clone": true,
+    "sdk_build": "Existing SDK, README ISP/MPP compile commands and runtime builder executed; all returned 0",
+    "firmware_reflashed": false,
+    "runtime_transferred_and_extracted_over_serial": true,
+    "board_runtime_sha256_check_passed": true,
+    "capture_seconds_per_mode": 60,
+    "overall_status": "NOT_ALL_MODES_PASSED",
+    "mode_status": {
+      "1080p30": "functional_pass",
+      "1440p30": "functional_pass",
+      "4k25": "failed_online_overwrite_and_stalls"
+    },
+    "results": [
+      {
+        "name": "1080p30-readme",
+        "stream": {
+          "codec_name": "hevc",
+          "width": 1920,
+          "height": 1080,
+          "r_frame_rate": "30000/1001",
+          "avg_frame_rate": "30000/1001"
+        },
+        "decoded_frames": 1785,
+        "first_decoded_pts": 0.539,
+        "last_decoded_pts": 59.992,
+        "decoded_fps": 30.00689620372395,
+        "max_frame_gap": 0.03900000000000148,
+        "median_frame_gap": 0.03300000000000125,
+        "video_bytes": 3196117,
+        "packet_payload_bytes": 3180692,
+        "frames_gap_over_1_8x_median": 0,
+        "complete_15s_window": true,
+        "requested_capture_seconds": 60,
+        "complete_capture_window": true,
+        "payload_mbps": 0.4279941466368392
+      },
+      {
+        "name": "1440p30-readme",
+        "stream": {
+          "codec_name": "hevc",
+          "width": 2560,
+          "height": 1440,
+          "r_frame_rate": "120/1",
+          "avg_frame_rate": "120/1"
+        },
+        "decoded_frames": 1788,
+        "first_decoded_pts": 0.443,
+        "last_decoded_pts": 59.99,
+        "decoded_fps": 30.009908139788735,
+        "max_frame_gap": 0.045000000000001705,
+        "median_frame_gap": 0.03300000000000125,
+        "video_bytes": 10448433,
+        "packet_payload_bytes": 10432946,
+        "frames_gap_over_1_8x_median": 0,
+        "complete_15s_window": true,
+        "requested_capture_seconds": 60,
+        "complete_capture_window": true,
+        "payload_mbps": 1.4016418627302802
+      },
+      {
+        "name": "4k25-readme",
+        "stream": {
+          "codec_name": "hevc",
+          "width": 3840,
+          "height": 2160,
+          "r_frame_rate": "50/1",
+          "avg_frame_rate": "50/1"
+        },
+        "decoded_frames": 925,
+        "first_decoded_pts": 0.38,
+        "last_decoded_pts": 58.554,
+        "decoded_fps": 15.883384329769314,
+        "max_frame_gap": 3.901999999999994,
+        "median_frame_gap": 0.03999999999999915,
+        "video_bytes": 2016736,
+        "packet_payload_bytes": 2008191,
+        "frames_gap_over_1_8x_median": 23,
+        "complete_15s_window": true,
+        "requested_capture_seconds": 60,
+        "complete_capture_window": true,
+        "payload_mbps": 0.2761633719531062
+      }
+    ],
+    "steady_decode_error_bytes": {
+      "1080p30": 0,
+      "1440p30": 0,
+      "4k25": 0
+    },
+    "native_windows_vlc_2k": {
+      "mode": "RTSP/TCP, software decode, dummy video output",
+      "exit_code": 0,
+      "negotiated_width": 2560,
+      "negotiated_height": 1440,
+      "warnings": "startup parameter-set wait and late pictures; not a visible-window visual acceptance"
+    },
+    "four_k_diagnostics": {
+      "unmodified_profile_15s_retry": "Reproduced overwrite; 18.394fps with 1.183s maximum gap",
+      "lbc_two_buffer_variant": "Rejected by current MPP: DMA STITCH Mode is not support LBC mode; not adopted",
+      "24fps_request_variant": "Did not eliminate overwrite; not adopted",
+      "configuration_restored": true
+    },
+    "conclusion": "Do not present 4K as stable or release-ready. FFmpeg decode success alone does not cover pre-encoding drops. No experimental runtime/config changes published."
   }
 }
