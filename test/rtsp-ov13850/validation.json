@@ -1,0 +1,230 @@
+{
+  "date": "2026-11-11",
+  "scope": "existing OV13850 multi-mode firmware; no SDK source or firmware changes",
+  "capture_seconds_each": 30,
+  "decoded_fps_formula": "(decoded_frames - 1) / (last_decoded_pts - first_decoded_pts)",
+  "steady_decode_command": "ffmpeg -hide_banner -v error -ss 2 -err_detect explode -i CLIP -map 0:v:0 -fps_mode passthrough -enc_time_base 1:1000 -f null -",
+  "decode_checks": [
+    {
+      "clip": "1080p30-usb-retry",
+      "rc": 0,
+      "error_log_bytes": 0
+    },
+    {
+      "clip": "1440p30-usb",
+      "rc": 0,
+      "error_log_bytes": 0
+    },
+    {
+      "clip": "4k25-usb",
+      "rc": 0,
+      "error_log_bytes": 0
+    },
+    {
+      "clip": "1080p30-wifi-final",
+      "rc": 0,
+      "error_log_bytes": 0
+    },
+    {
+      "clip": "1440p30-wifi-final",
+      "rc": 0,
+      "error_log_bytes": 0
+    },
+    {
+      "clip": "4k25-wifi-final",
+      "rc": 0,
+      "error_log_bytes": 0
+    },
+    {
+      "clip": "1440p30-runner",
+      "rc": 0,
+      "error_log_bytes": 0
+    }
+  ],
+  "runner_cleanup_verified": true,
+  "existing_iq_backup_restore_verified": true,
+  "results": [
+    {
+      "name": "1080p30-usb-retry",
+      "stream": {
+        "codec_name": "hevc",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1"
+      },
+      "decoded_frames": 889,
+      "first_decoded_pts": 0.405,
+      "last_decoded_pts": 29.996,
+      "decoded_fps": 30.0091243959312,
+      "max_frame_gap": 0.038999999999999924,
+      "median_frame_gap": 0.03300000000000125,
+      "video_bytes": 6644831,
+      "packet_payload_bytes": 6636750,
+      "frames_gap_over_1_8x_median": 0,
+      "complete_15s_window": true,
+      "requested_capture_seconds": 30,
+      "complete_capture_window": true,
+      "payload_mbps": 1.7942617687810485
+    },
+    {
+      "name": "1440p30-usb",
+      "stream": {
+        "codec_name": "hevc",
+        "width": 2560,
+        "height": 1440,
+        "r_frame_rate": "120/1",
+        "avg_frame_rate": "120/1"
+      },
+      "decoded_frames": 886,
+      "first_decoded_pts": 0.509,
+      "last_decoded_pts": 29.996,
+      "decoded_fps": 30.01322616746363,
+      "max_frame_gap": 0.04300000000000015,
+      "median_frame_gap": 0.03300000000000125,
+      "video_bytes": 23276661,
+      "packet_payload_bytes": 23268187,
+      "frames_gap_over_1_8x_median": 0,
+      "complete_15s_window": true,
+      "requested_capture_seconds": 30,
+      "complete_capture_window": true,
+      "payload_mbps": 6.312798724861803
+    },
+    {
+      "name": "4k25-usb",
+      "stream": {
+        "codec_name": "hevc",
+        "width": 3840,
+        "height": 2160,
+        "r_frame_rate": "50/1",
+        "avg_frame_rate": "50/1"
+      },
+      "decoded_frames": 704,
+      "first_decoded_pts": 0.741,
+      "last_decoded_pts": 29.996,
+      "decoded_fps": 24.030080328149037,
+      "max_frame_gap": 0.06300000000000061,
+      "median_frame_gap": 0.040000000000000036,
+      "video_bytes": 12586535,
+      "packet_payload_bytes": 12579600,
+      "frames_gap_over_1_8x_median": 0,
+      "complete_15s_window": true,
+      "requested_capture_seconds": 30,
+      "complete_capture_window": true,
+      "payload_mbps": 3.439986327123569
+    },
+    {
+      "name": "1080p30-wifi-final",
+      "stream": {
+        "codec_name": "hevc",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30000/1001",
+        "avg_frame_rate": "30000/1001"
+      },
+      "decoded_frames": 888,
+      "first_decoded_pts": 0.438,
+      "last_decoded_pts": 29.995,
+      "decoded_fps": 30.009811550563317,
+      "max_frame_gap": 0.03900000000000148,
+      "median_frame_gap": 0.03300000000000125,
+      "video_bytes": 13204755,
+      "packet_payload_bytes": 13196487,
+      "frames_gap_over_1_8x_median": 0,
+      "complete_15s_window": true,
+      "requested_capture_seconds": 30,
+      "complete_capture_window": true,
+      "payload_mbps": 3.571806881618567
+    },
+    {
+      "name": "1440p30-wifi-final",
+      "stream": {
+        "codec_name": "hevc",
+        "width": 2560,
+        "height": 1440,
+        "r_frame_rate": "120/1",
+        "avg_frame_rate": "120/1"
+      },
+      "decoded_frames": 883,
+      "first_decoded_pts": 0.608,
+      "last_decoded_pts": 29.994,
+      "decoded_fps": 30.01429252024774,
+      "max_frame_gap": 0.04300000000000015,
+      "median_frame_gap": 0.03300000000000125,
+      "video_bytes": 27854835,
+      "packet_payload_bytes": 27846069,
+      "frames_gap_over_1_8x_median": 0,
+      "complete_15s_window": true,
+      "requested_capture_seconds": 30,
+      "complete_capture_window": true,
+      "payload_mbps": 7.580771523854898
+    },
+    {
+      "name": "4k25-wifi-final",
+      "stream": {
+        "codec_name": "hevc",
+        "width": 3840,
+        "height": 2160,
+        "r_frame_rate": "50/1",
+        "avg_frame_rate": "50/1"
+      },
+      "decoded_frames": 715,
+      "first_decoded_pts": 0.182,
+      "last_decoded_pts": 29.998,
+      "decoded_fps": 23.94687416152401,
+      "max_frame_gap": 0.08000000000000007,
+      "median_frame_gap": 0.040000000000000036,
+      "video_bytes": 12484292,
+      "packet_payload_bytes": 12477211,
+      "frames_gap_over_1_8x_median": 3,
+      "complete_15s_window": true,
+      "requested_capture_seconds": 30,
+      "complete_capture_window": true,
+      "payload_mbps": 3.347789374832305
+    },
+    {
+      "name": "1440p30-runner",
+      "stream": {
+        "codec_name": "hevc",
+        "width": 2560,
+        "height": 1440,
+        "r_frame_rate": "30000/1001",
+        "avg_frame_rate": "30000/1001"
+      },
+      "decoded_frames": 873,
+      "first_decoded_pts": 0.941,
+      "last_decoded_pts": 29.995,
+      "decoded_fps": 30.01307909410064,
+      "max_frame_gap": 0.04300000000000015,
+      "median_frame_gap": 0.03300000000000125,
+      "video_bytes": 28749963,
+      "packet_payload_bytes": 28741232,
+      "frames_gap_over_1_8x_median": 0,
+      "complete_15s_window": true,
+      "requested_capture_seconds": 30,
+      "complete_capture_window": true,
+      "payload_mbps": 7.913879534659599
+    }
+  ],
+  "limitations": [
+    "4K decoded FPS about 24, not a stable 25",
+    "4K WiFi: 3 gaps over 1.8x median in 30s",
+    "WiFi queues and short TCP writes observed",
+    "No long-duration or full ISP color calibration acceptance",
+    "Known 4K stream-off TDM error and sensor optional ioctl warnings remain"
+  ],
+  "source_rebuild_byte_identical": [
+    "iq25",
+    "iq30",
+    "librtsp_tcp_writeall.so"
+  ],
+  "build_verification": {
+    "sdk_sources_modified": false,
+    "original_sample_byte_identical": true,
+    "iq25_byte_identical": true,
+    "iq30_byte_identical": true,
+    "rtsp_library_byte_identical": true,
+    "profiles_effective_values_identical": true,
+    "note": "Only trailing whitespace on blank config assignments was removed for publication; frame captures were made before publication cleanup."
+  }
+}

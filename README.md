@@ -86,6 +86,12 @@ wpa_cli -p /tmp/wpa_supplicant -i wlan0 terminate
 
 v0.1.0 为先前摄像头版本，**不含本次 TF WiFi 适配**。可以从 [v0.1.0 Release](https://github.com/dshanpi/avaota-f2-patches/releases/tag/v0.1.0) 下载匹配固件、采集应用和测试配置，使用 `run.sh <模式> save|stream` 存图或测持续收帧。完整步骤见 [Release 摄像头测试说明](docs/camera-test-v0.1.0.md)。
 
+## OV13850 RTSP 展示优化（可选）
+
+新增 [test/rtsp-ov13850](test/rtsp-ov13850/README.md)，提供 `sample_smartIPC_demo` 的 1080P30、2K30、4K 目标 25fps 配置、AE 参数导出源码、RTSP TCP 运行时修正源码及编译/串口运行指南。原应用使用 SDK 自带源码，不新增驱动或固件修改；不要将本目录覆盖到 SDK 的 `source/`。
+
+推荐展示优先使用 2K30。当前短测 1080P/2K 约 30fps、4K 约 24fps，尚未达到稳定满 25fps，也未完成长期稳定性和专业 ISP 标定。构建生成的运行包、实拍画面和无线凭据不提交到仓库。
+
 ## 仓库内容与修改范围
 
 ```text
@@ -93,6 +99,7 @@ source/                 21 个完整源文件，保留 SDK 相对路径
 patches/                原始 SDK 完整补丁和指定版本增量补丁
 test/modes/             7 档模式，各一份存图和一份持续收帧配置
 test/sample_virvi-multimode.patch  4K/720p 采集示例的独立补丁
+test/rtsp-ov13850/      可选 RTSP 展示参数、修正源码、构建与运行指南
 test/                   保留原有 2K 测试配置
 docs/changes.md         每个修改文件的用途
 docs/multimode-validation.md      本轮多模式测试记录
